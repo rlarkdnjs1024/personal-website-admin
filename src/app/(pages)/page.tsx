@@ -6,6 +6,9 @@ import DatePicker from "@/components/input/date-input";
 import {CheckBoxGroup, CheckBoxItem, SingleCheckBox} from "@/components/input/checkbox";
 import {TextInput} from "@/components/input/text-input";
 import {HashTagInput} from "@/components/input/hash-tag";
+import {FONTS} from "@/fonts/fonts";
+import {cn} from "@/lib/utils";
+import {Pagination} from "@/components/pagination";
 
 export default function Home() {
   const [radioValue, setRadioValue] = useState("PHOTO");
@@ -14,6 +17,8 @@ export default function Home() {
   const [weeks, setWeeks] = useState<string[]>([]);
   const [comment, setComment] = useState<string>("");
   const [hashtags, setHashtags] = useState<string[]>([]);
+  const [font, setFont] = useState<string>("");
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
   useEffect(() => {
       console.log("=================================");
@@ -22,6 +27,12 @@ export default function Home() {
      console.log("topFix", topFix);
      console.log("weeks", weeks);
   });
+
+  const totalFontCount = FONTS.length;
+  const pageSize = 8;
+  const totalPage = Math.ceil(totalFontCount / pageSize);
+  const fontData = FONTS.slice(pageSize * (currentPage-1), pageSize * currentPage);
+  console.log("total page", totalPage);
 
   return (
     <div>
@@ -74,11 +85,38 @@ export default function Home() {
 
 
           <div>
-              <div>
-                  해시태그
+              <div >
+                  Hashtags
               </div>
               <HashTagInput hashtags={hashtags} onChange={setHashtags} maxLength={10} maxCount={5}/>
           </div>
+
+          <div>
+              <div >
+                  Font
+              </div>
+              <Pagination
+                  currentPage={currentPage}
+                  onPageChange={setCurrentPage}
+                  totalDataLength={FONTS.length}
+                  pageSize={pageSize}
+              >
+                  {fontData.map(x => (
+                      <div key={x.id}>
+                          <button
+                              className="w-full flex items-center hover:bg-gray-100 hover:cursor-pointer border-b-blue-800"
+                              onClick={() => setFont(x.id)}
+                          >
+                              <span>{x.label}</span>
+                              <span className={cn("flex-1 text-center", x.className)}>Summer of 69</span>
+                              <span className="w-4 text-right">{font === x.id && <>&#10004;</>}</span>
+                          </button>
+                      </div>
+                  ))}
+              </Pagination>
+          </div>
+
+
       </main>
     </div>
   );

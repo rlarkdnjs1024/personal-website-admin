@@ -1,6 +1,7 @@
 import {TextInput} from "@/components/input/text-input";
 import {useState} from "react";
 
+
 type HashTagInputProps = {
     hashtags: string[],
     onChange: (hashtags: string[]) => void,
