@@ -4,11 +4,15 @@ import {JSX} from "react";
 type PaginationProps = {
     currentPage: number;
     onPageChange: (page: number) => void;
-    totalDataLength: number;
-    children: React.ReactNode;
 
     //한 페이지에 뿌릴 데이터 개수
     pageSize?: number;
+    actualSize: number;
+
+    totalPageCount: number
+    totalDataLength: number;
+
+    children: React.ReactNode;
 
     //하단의 페이지 이동 도구에 보여질 버튼의 개수
     buttonCount?: number;
@@ -17,14 +21,17 @@ type PaginationProps = {
 export function Pagination ({
     currentPage,
     onPageChange,
-    totalDataLength,
-    pageSize = 8,
-    buttonCount = 5,
-    children
-}: PaginationProps){
 
-    //필요한 전체 페이지의 개수
-    const totalPages = Math.ceil(totalDataLength / pageSize);
+    pageSize = 8,
+    actualSize,
+
+    totalPageCount,
+    totalDataLength,
+
+    children,
+    buttonCount = 5,
+
+}: PaginationProps){
 
     //보여질 버튼 그룹의 페이지
     const currentButtonPage = Math.floor( currentPage / buttonCount ) + (currentPage % buttonCount === 0 ?  0 : 1);
@@ -33,7 +40,7 @@ export function Pagination ({
     const buttonStart = 1 + buttonCount * (currentButtonPage - 1);
 
     //페이지 이동 버튼 끝 숫자
-    const buttonEnd = Math.min(buttonCount * currentButtonPage, totalPages);
+    const buttonEnd = Math.min(buttonCount * currentButtonPage, totalPageCount);
 
     //화면에 보여줄 버튼의 실제 개수
     const displayButtonCount = buttonEnd - buttonStart + 1
@@ -43,10 +50,10 @@ export function Pagination ({
             {children}
 
             {/*버튼 메뉴*/}
-            { (totalDataLength > 0 && totalPages > 1) &&
+            { (totalDataLength > 0 && totalPageCount > 1) &&
                 (<div className="flex items-center justify-center gap-1 p-2 mt-auto">
                         {
-                            totalPages > buttonCount && (
+                            totalPageCount > buttonCount && (
                                 <button
                                     className="rounded border px-2 py-1 cursor-pointer hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent"
                                     onClick={() => onPageChange(1)}
@@ -78,18 +85,18 @@ export function Pagination ({
                     ))}
                     <button
                         className="rounded border px-2 py-1 cursor-pointer hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent"
-                        onClick={() => onPageChange(Math.min(currentPage + 1, totalPages))}
-                        disabled={currentPage === totalPages}
+                        onClick={() => onPageChange(Math.min(currentPage + 1, totalPageCount))}
+                        disabled={currentPage === totalPageCount}
                     >
                         {">"}
                     </button>
 
                     {
-                        totalPages > buttonCount && (
+                        totalPageCount > buttonCount && (
                             <button
                                 className="rounded border px-2 py-1 cursor-pointer hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent"
-                                onClick={() => onPageChange(totalPages)}
-                                disabled={currentPage === totalPages}
+                                onClick={() => onPageChange(totalPageCount)}
+                                disabled={currentPage === totalPageCount}
                             >
                                 {">>"}
                             </button>

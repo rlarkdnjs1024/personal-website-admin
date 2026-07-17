@@ -9,6 +9,8 @@ import {HashTagInput} from "@/components/input/hash-tag";
 import {FONTS} from "@/fonts/fonts";
 import {cn} from "@/lib/utils";
 import {Pagination} from "@/components/pagination";
+import {paginateList} from "../../lib/utils";
+import {pageBootstrap} from "next/dist/client/page-bootstrap";
 
 export default function Home() {
   const [radioValue, setRadioValue] = useState("PHOTO");
@@ -28,11 +30,8 @@ export default function Home() {
      console.log("weeks", weeks);
   });
 
-  const totalFontCount = FONTS.length;
-  const pageSize = 8;
-  const totalPage = Math.ceil(totalFontCount / pageSize);
-  const fontData = FONTS.slice(pageSize * (currentPage-1), pageSize * currentPage);
-  console.log("total page", totalPage);
+  const PAGE_SIZE = 4;
+  const pagedResult = paginateList({sourceList: FONTS, pageSize: PAGE_SIZE, page: currentPage});
 
   return (
     <div>
@@ -98,10 +97,14 @@ export default function Home() {
               <Pagination
                   currentPage={currentPage}
                   onPageChange={setCurrentPage}
-                  totalDataLength={FONTS.length}
-                  pageSize={pageSize}
+
+                  totalPageCount={pagedResult.totalPageCount}
+                  totalDataLength={pagedResult.totalDataLength}
+
+                  pageSize={PAGE_SIZE}
+                  actualSize={pagedResult.actualSize}
               >
-                  {fontData.map(x => (
+                  { pagedResult.pagedList.map(x => (
                       <div key={x.id}>
                           <button
                               className="w-full flex items-center hover:bg-gray-100 hover:cursor-pointer border-b-blue-800"
@@ -114,6 +117,11 @@ export default function Home() {
                       </div>
                   ))}
               </Pagination>
+          </div>
+
+          <div>
+              색깔
+              <input type="color"/>
           </div>
 
 
