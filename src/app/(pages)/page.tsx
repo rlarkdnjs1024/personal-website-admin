@@ -9,8 +9,9 @@ import {HashTagInput} from "@/components/input/hash-tag";
 import {FONTS} from "@/fonts/fonts";
 import {cn} from "@/lib/utils";
 import {Pagination} from "@/components/pagination";
-import {paginateList} from "../../lib/utils";
-import {pageBootstrap} from "next/dist/client/page-bootstrap";
+import {paginateList} from "@/lib/utils";
+import {ColorPicker} from "@/components/input/color-picker";
+
 
 export default function Home() {
   const [radioValue, setRadioValue] = useState("PHOTO");
@@ -21,6 +22,7 @@ export default function Home() {
   const [hashtags, setHashtags] = useState<string[]>([]);
   const [font, setFont] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [color, setColor] = useState<string>("#FFFDF8");
 
   useEffect(() => {
       console.log("=================================");
@@ -28,6 +30,7 @@ export default function Home() {
      console.log("dateValue", dateValue);
      console.log("topFix", topFix);
      console.log("weeks", weeks);
+     console.log("color", color);
   });
 
   const PAGE_SIZE = 4;
@@ -121,7 +124,7 @@ export default function Home() {
 
           <div>
               색깔
-              <input type="color"/>
+              <ColorPicker value={color} onValueChange={setColor} name={"color"}/>
           </div>
 
 

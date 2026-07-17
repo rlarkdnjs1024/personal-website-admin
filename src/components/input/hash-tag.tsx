@@ -13,7 +13,6 @@ type HashTagInputProps = {
 export function HashTagInput({hashtags, onChange, maxCount, minLength, maxLength}: HashTagInputProps) {
 
     const [inputText, setInputText] = useState("");
-    console.log("해시태그 길이", hashtags.length);
 
     const errorMessage =
         hashtags.length === maxCount && inputText.trim() ? `You can add up to ${maxCount} hashtags.` : "";
