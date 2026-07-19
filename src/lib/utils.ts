@@ -57,3 +57,21 @@ export function paginateList<T> (input: paginateListInput<T>): paginateListOutpu
         totalDataLength: totalDataLength,
     }
 }
+
+export function validateFileType (fileType: string, acceptedFileTypes: string[]) {
+    return acceptedFileTypes.includes(fileType);
+}
+
+type ImageDimension = {
+    width: number,
+    height: number
+}
+
+export function validateImageDimension (dimension: ImageDimension, maximumDimension: ImageDimension) {
+    return dimension.width <= maximumDimension.width && dimension.height <= maximumDimension.height;
+}
+
+export function validateSize (size: number, maximumSize: number) {
+    return size <= maximumSize;
+}
+

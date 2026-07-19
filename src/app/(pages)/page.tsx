@@ -11,6 +11,7 @@ import {cn} from "@/lib/utils";
 import {Pagination} from "@/components/pagination";
 import {paginateList} from "@/lib/utils";
 import {ColorPicker} from "@/components/input/color-picker";
+import {ImageSelector, UploadImage} from "@/components/input/image-selector";
 
 
 export default function Home() {
@@ -23,6 +24,7 @@ export default function Home() {
   const [font, setFont] = useState<string>("");
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [color, setColor] = useState<string>("#FFFDF8");
+  const [image, setImage] = useState<UploadImage|null>(null);
 
   useEffect(() => {
       console.log("=================================");
@@ -33,7 +35,7 @@ export default function Home() {
      console.log("color", color);
   });
 
-  const PAGE_SIZE = 4;
+  const PAGE_SIZE = 10;
   const pagedResult = paginateList({sourceList: FONTS, pageSize: PAGE_SIZE, page: currentPage});
 
   return (
@@ -127,6 +129,14 @@ export default function Home() {
               <ColorPicker value={color} onValueChange={setColor} name={"color"}/>
           </div>
 
+          <div>
+              미리보기 영역
+          </div>
+
+          <div>
+              사진 선택
+              <ImageSelector file={image} onFileChange={setImage}/>
+          </div>
 
       </main>
     </div>
