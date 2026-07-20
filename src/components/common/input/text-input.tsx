@@ -42,7 +42,7 @@ export function TextInput({name, value, onValueChange, onKeyDown, minLength, max
                 onKeyDown={onKeyDown}
                 placeholder={placeholder}
                 maxLength={maxLength}
-                className={cn("border-2 border-blue-800 bg-transparent text-foreground outline-none", className)}
+                className={cn("border rounded-lg border-green-800 bg-transparent text-foreground outline-none w-full", className)}
             />
             <p className={cn("text-red-600 inline", displayErrorMessage ? "visible" : "invisible")}>
                 {displayErrorMessage || "\u00A0"}

@@ -67,6 +67,37 @@ export const spaceMono700Italic = localFont({
     display: "swap",
 });
 
+export const courierPrime400 = localFont({
+    src: "./CourierPrime-Regular.ttf",
+    display: "swap",
+});
+
+export const courierPrime400Italic = localFont({
+    src: "./CourierPrime-Italic.ttf",
+    display: "swap",
+});
+
+export const courierPrime700 = localFont({
+    src: "./CourierPrime-Bold.ttf",
+    display: "swap",
+});
+
+export const courierPrime700Italic = localFont({
+    src: "./CourierPrime-BoldItalic.ttf",
+    display: "swap",
+});
+
+// font-style/font-weight CSS 속성으로 italic, bold를 전환할 수 있도록 4개 파일을 하나의 폰트 패밀리로 묶은 버전
+export const courierPrime = localFont({
+    src: [
+        {path: "./CourierPrime-Regular.ttf", weight: "400", style: "normal"},
+        {path: "./CourierPrime-Italic.ttf", weight: "400", style: "italic"},
+        {path: "./CourierPrime-Bold.ttf", weight: "700", style: "normal"},
+        {path: "./CourierPrime-BoldItalic.ttf", weight: "700", style: "italic"},
+    ],
+    display: "swap",
+});
+
 export const FONTS = [
     {
         id: "RIBEYE",
@@ -145,5 +176,29 @@ export const FONTS = [
         label: "space-mono-700-italic",
         language: "english",
         className: spaceMono700Italic.className,
+    },
+    {
+        id: "COURIER_PRIME_400",
+        label: "courier-prime-400",
+        language: "english",
+        className: courierPrime400.className,
+    },
+    {
+        id: "COURIER_PRIME_400_ITALIC",
+        label: "courier-prime-400-italic",
+        language: "english",
+        className: courierPrime400Italic.className,
+    },
+    {
+        id: "COURIER_PRIME_700",
+        label: "courier-prime-700",
+        language: "english",
+        className: courierPrime700.className,
+    },
+    {
+        id: "COURIER_PRIME_700_ITALIC",
+        label: "courier-prime-700-italic",
+        language: "english",
+        className: courierPrime700Italic.className,
     },
 ]

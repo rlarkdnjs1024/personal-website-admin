@@ -11,9 +11,10 @@ type RadioGroupProps = {
 
 export function RadioGroup({name, value, onValueChange, children}: RadioGroupProps) {
     return (
-        <RadioGroupContext value={{name, value, onValueChange: onValueChange}}>
-            {children}
-        </RadioGroupContext>
+            <RadioGroupContext value={{name, value, onValueChange: onValueChange}}>
+                {children}
+            </RadioGroupContext>
+
     )
 }
 

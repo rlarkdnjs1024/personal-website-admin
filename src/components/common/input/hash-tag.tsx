@@ -1,4 +1,4 @@
-import {TextInput} from "@/components/input/text-input";
+import {TextInput} from "@/components/common/input/text-input";
 import {useState} from "react";
 
 
@@ -54,7 +54,7 @@ export function HashTagInput({hashtags, onChange, maxCount, minLength, maxLength
     return (
         <div>
             {hashtags.map(tag => (
-                <span key={tag} className="border border-black">
+                <span key={tag} className="border border-black mr-0.5">
                     {"#"}{tag}
                     <button type="button" onClick={() => handleDelete(tag)}>
                         &#215;
@@ -68,7 +68,7 @@ export function HashTagInput({hashtags, onChange, maxCount, minLength, maxLength
                 onKeyDown={handleKeyDown}
                 minLength={minLength}
                 maxLength={maxLength}
-                className="border-0 inline"
+                className="border-0 inline w-1/3"
                 errorMessage={errorMessage}
             />
         </div>

@@ -3,21 +3,26 @@ import {cn} from "@/lib/utils";
 import {HexAlphaColorPicker} from "react-colorful";
 
 const DEFAULT_COLORS = [
-
-    { name: "coral red", value: "#FFD6D680" },
-    { name: "apricot orange", value: "#FFE2CC80" },
-    { name: "butter yellow", value: "#FFF0C280" },
-    { name: "line cream", value: "#E8F5C880" },
-    { name: "mint green", value: "#D9F2D080" },
-    { name: "torqoise", value: "#CFEFE880" },
-    { name: "pastel blue", value: "#D6ECFF80" },
-    { name: "lavender blue", value: "#DCDFFF80" },
-    { name: "연보라", value: "#E9D8FF80" },
-    { name: "라일락 핑크", value: "#F4D6FF80" },
-    { name: "베이비 핑크", value: "#FFD8EB80" },
-    { name: "로즈 베이지", value: "#F6D9D080" },
-    { name: "크림 베이지", value: "#E8DED380" },
-    { name: "소프트 그레이", value: "#A6A59C1F" },
+    { name: "Coral Red", value: "#FFD6D680" },
+    { name: "Apricot Orange", value: "#FFE2CC80" },
+    { name: "Butter Yellow", value: "#FFF0C280" },
+    { name: "Lime Cream", value: "#E8F5C880" },
+    { name: "Mint Green", value: "#D9F2D080" },
+    { name: "Turquoise", value: "#CFEFE880" },
+    { name: "Pastel Blue", value: "#D6ECFF80" },
+    { name: "Lavender Blue", value: "#DCDFFF80" },
+    { name: "Light Purple", value: "#E9D8FF80" },
+    { name: "Lilac Pink", value: "#F4D6FF80" },
+    { name: "Baby Pink", value: "#FFD8EB80" },
+    { name: "Rose Beige", value: "#F6D9D080" },
+    { name: "Cream Beige", value: "#E8DED380" },
+    { name: "Soft Gray", value: "#A6A59C1F" },
+    { name: "Peach Pink", value: "#FFCDBD80" },
+    { name: "Honey Gold", value: "#F6D58A80" },
+    { name: "Sage Green", value: "#C8DDBF80" },
+    { name: "Powder Teal", value: "#BFE3DF80" },
+    { name: "Periwinkle", value: "#C9D0F580" },
+    { name: "Dusty Mauve", value: "#D8BFD080" },
 ];
 
 type ColorPickerProps = {
@@ -48,11 +53,11 @@ export function ColorPicker({value, onValueChange, name}: ColorPickerProps) {
     }
 
     return (
-        <div>
-            <div className="relative inline-block">
+        <div className="flex w-full justify-between">
+            <div className="relative w-[20%]">
                 <button
                     onClick={() => setIsPickerOpen(!isPickerOpen)}
-                    className="w-20 h-20 rounded-full border-4 border-white shadow-md ring-1 ring-gray-200 cursor-pointer transition-transform hover:scale-105 hover:shadow-lg"
+                    className="w-full aspect-square rounded-full border-4 border-white shadow-md ring-1 ring-gray-200 cursor-pointer transition-transform hover:scale-105 hover:shadow-lg"
                     style={{ backgroundColor: previewColor }}
                 >
                 </button>
@@ -97,47 +102,34 @@ export function ColorPicker({value, onValueChange, name}: ColorPickerProps) {
                 )}
             </div>
 
-            <div className="inline-block">
-                <div className="flex flex-col gap-2">
-                    <div className="flex gap-1">
-                        {DEFAULT_COLORS.map(color => (
-                            <button
-                                key={color.value}
-                                onClick={() => {
-                                    setInputValue(color.value);
-                                    setPreviewColor(color.value);
-                                    onValueChange(color.value);
-                                }}
-                                className="h-6 w-6 rounded
-                                        border border-black/10
-                                        shadow-sm
-                                        transition-all duration-150
-                                        hover:-translate-y-0.5
-                                        hover:cursor-pointer
-                                        hover:scale-110
-                                        hover:border-black/20
-                                        hover:shadow-md
-                                        focus-visible:outline-none
-                                        focus-visible:ring-2
-                                        focus-visible:ring-gray-400
-                                        focus-visible:ring-offset-2
-                                        active:scale-95"
-                                style={{ backgroundColor: color.value }}
-                            >
-                            </button>
-                        ))}
-
-                    </div>
-
-                    <div className="flex gap-1">
-                        <button onClick={() => onValueChange("#FFFDF8")}>
-                            <div className={cn("w-6 h-6 rounded",  `bg-[${previewColor}]`)}/>
+            <div className="grid grid-cols-10 gap-1 w-[70%] items-center">
+                    {DEFAULT_COLORS.map(color => (
+                        <button
+                            key={color.value}
+                            onClick={() => {
+                                setInputValue(color.value);
+                                setPreviewColor(color.value);
+                                onValueChange(color.value);
+                            }}
+                            className="w-full aspect-square rounded
+                                    border border-black/10
+                                    shadow-sm
+                                    transition-all duration-150
+                                    hover:-translate-y-0.5
+                                    hover:cursor-pointer
+                                    hover:scale-110
+                                    hover:border-black/20
+                                    hover:shadow-md
+                                    focus-visible:outline-none
+                                    focus-visible:ring-2
+                                    focus-visible:ring-gray-400
+                                    focus-visible:ring-offset-2
+                                    active:scale-95"
+                            style={{ backgroundColor: color.value }}
+                        >
                         </button>
-                    </div>
+                    ))}
                 </div>
-            </div>
-
-
         </div>
 
     )

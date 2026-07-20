@@ -1,17 +1,17 @@
 "use client"
 
-import {RadioGroup, RadioItem} from "@/components/input/radio";
+import {RadioGroup, RadioItem} from "@/components/common/input/radio";
 import {useEffect, useState} from "react";
-import DatePicker from "@/components/input/date-input";
-import {CheckBoxGroup, CheckBoxItem, SingleCheckBox} from "@/components/input/checkbox";
-import {TextInput} from "@/components/input/text-input";
-import {HashTagInput} from "@/components/input/hash-tag";
+import DatePicker from "@/components/common/input/date-input";
+import {CheckBoxGroup, CheckBoxItem, SingleCheckBox} from "@/components/common/input/checkbox";
+import {TextInput} from "@/components/common/input/text-input";
+import {HashTagInput} from "@/components/common/input/hash-tag";
 import {FONTS} from "@/fonts/fonts";
 import {cn} from "@/lib/utils";
-import {Pagination} from "@/components/pagination";
+import {Pagination} from "@/components/common/pagination";
 import {paginateList} from "@/lib/utils";
-import {ColorPicker} from "@/components/input/color-picker";
-import {ImageSelector, UploadImage} from "@/components/input/image-selector";
+import {ColorPicker} from "@/components/common/color-picker";
+import {ImageSelector, UploadImage} from "@/components/common/image-selector";
 
 
 export default function Home() {
@@ -39,8 +39,7 @@ export default function Home() {
   const pagedResult = paginateList({sourceList: FONTS, pageSize: PAGE_SIZE, page: currentPage});
 
   return (
-    <div>
-      <main>
+      <div>
         <div>
             <div>
                 사진 업로드 형식
@@ -135,10 +134,36 @@ export default function Home() {
 
           <div>
               사진 선택
-              <ImageSelector file={image} onFileChange={setImage}/>
+              <ImageSelector name={"image"} file={image} onFileChange={setImage}/>
           </div>
 
-      </main>
-    </div>
+          <div>
+              <RectanglePolaroidPreview/>
+          </div>
+
+      </div>
   );
+}
+
+function RectanglePolaroidPreview () {
+    return (
+        <div className="flex flex-col items-center">
+            <div
+                className="w-1/2 [aspect-ratio:1/1.6] [container-type:inline-size] [rotate:3deg] px-[0.5%] pt-[1%] pb-[0.5%] bg-blue-50 shadow-[0_4px_4px_rgba(0,0,0,0.25)]">
+                <img
+                    src="/img_conver_test.jpg"
+                    className="mb-[1%] block w-full aspect-[1/1.3] object-cover"
+                />
+
+                <div className="text-[7cqw]">
+            <span>
+                2026.11.14
+                <br/>
+                Napolitan spaghetti with Seryoen
+            </span>
+                </div>
+            </div>
+        </div>
+
+    )
 }
