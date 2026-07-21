@@ -96,7 +96,10 @@ export function formatBytes (bytes: number, fractionDigits = 2) {
 
     const value = bytes / Math.pow(1024, exponent);
 
-    return `${value.toFixed(fractionDigits)} ${BYTE_UNITS[exponent]}`;
+    //소수점 부분이 0이면(예: 500.00, 1.50 -> 1.5) 불필요한 0을 제거한다.
+    const formattedValue = parseFloat(value.toFixed(fractionDigits));
+
+    return `${formattedValue} ${BYTE_UNITS[exponent]}`;
 }
 
 //File 객체의 이름에서 확장자를 제외한 이름을 추출한다.

@@ -19,8 +19,8 @@ export default function Home() {
     const [comment, setComment] = useState<string>("");
     const [hashTags, setHashTags] = useState<string[]>([]);
     const [date, setDate] = useState<string>("2025-12-31");
-    const [useAutoConvert, setUseAutoConvert] = useState<boolean>(false);
-    const [useAutoAdjust, setUseAutoAdjust] = useState<boolean>(false);
+    const [useAutoConvert, setUseAutoConvert] = useState<boolean>(true);
+    const [useAutoAdjust, setUseAutoAdjust] = useState<boolean>(true);
 
     const policy: ImageSelectorPolicy  = {
         maximumBytes: 500 * 1024,
@@ -34,18 +34,25 @@ export default function Home() {
             <div className="h-full flex flex-row">
                 <section className="h-full flex-1 flex flex-col justify-between">
                     <div
-                        className="w-[33%] [aspect-ratio:1/1.6] [container-type:inline-size] [rotate:3deg] m-auto px-[0.5%] pt-[1%] pb-[0.5%] bg-blue-50 shadow-[0_4px_4px_rgba(0,0,0,0.25)]">
-                        <img
-                            src="/img_conver_test.jpg"
-                            className="mb-[1%] block w-full aspect-[1/1.3] object-cover"
-                        />
+                        style={{backgroundColor: color}}
+                        className="w-[33%] [aspect-ratio:1/1.6] [container-type:inline-size] [rotate:3deg] m-auto px-[0.5%] pt-[1%] pb-[0.5%] bg-blue-50 shadow-[0_4px_4px_rgba(0,0,0,0.25)] overflow-hidden">
+                        {
+                            image === null ? (
+                                <div className="mb-[1%] block w-full aspect-[1/1.3] bg-gray-400"></div>
 
-                        <div className="text-[7cqw]">
-                        <span>
-                            2026.11.14
-                            <br/>
-                            Napolitan spaghetti in Osaka!
-                        </span>
+                            ) : (
+                                <img
+                                    src={image?.previewUrl}
+                                    className="mb-[1%] block w-full aspect-[1/1.3] object-cover"
+                                />
+                            )
+                        }
+                        <div className="text-[7cqw] w-full">
+                            <span>
+                                {date}
+                                <br/>
+                            </span>
+                                {comment}
                         </div>
                     </div>
                 </section>
@@ -55,7 +62,7 @@ export default function Home() {
                     <div className={"font-bold text-lg"}>Follow the instructions to style your photo</div>
 
                     <SideBarRow> Step 1. Choose the style of your image</SideBarRow>
-                    <div>
+                    <div className={"flex items-center justify-between pl-2 pr-2 box-border"}>
                         <RadioGroup name={"display-style"} value={displayStyle} onValueChange={setDisplayStyle}>
                             <RadioItem itemValue={"REC_POLAROID"}>Rectangular polaroid</RadioItem>
                             <RadioItem itemValue={"SQR_POLAROID"}>Square polaroid</RadioItem>

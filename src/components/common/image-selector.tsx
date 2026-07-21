@@ -1,4 +1,12 @@
-import {cn, convertHeicToJpeg, extractFileName, validateFileType, validateImageDimension, validateSize} from "@/lib/utils";
+import {
+    cn,
+    convertHeicToJpeg,
+    extractFileName,
+    formatBytes,
+    validateFileType,
+    validateImageDimension,
+    validateSize
+} from "@/lib/utils";
 import {useRef, useState} from "react";
 import {isHeic} from "heic-to";
 import imageCompression from "browser-image-compression";
@@ -261,7 +269,7 @@ export function ImageSelector({name, file, onFileChange, policy}: ImageSelectorP
                     </div>
                     <div className="text-sm text-gray-500 flex flex-col items-center justify-center">
                         <div>
-                            {!AUTO_ADJUST && `${MAXIMUM_BYTES}B, ${MAXIMUM_WIDTH_OR_HEIGHT}x${MAXIMUM_WIDTH_OR_HEIGHT} px`}
+                            {!AUTO_ADJUST && `${formatBytes(MAXIMUM_BYTES)}, ${MAXIMUM_WIDTH_OR_HEIGHT}x${MAXIMUM_WIDTH_OR_HEIGHT} px`}
                         </div>
                     </div>
                 </div>
@@ -284,7 +292,7 @@ export function ImageSelector({name, file, onFileChange, policy}: ImageSelectorP
                 </div>
                 <div className="flex flex-col items-center justify-center">
                     <div>{file.originalName}</div>
-                    <div>{file.dimension.width} x {file.dimension.height} ({file.size}B)</div>
+                    <div>{file.dimension.width} x {file.dimension.height} ({formatBytes(file.size)})</div>
                 </div>
             </div>
         );
