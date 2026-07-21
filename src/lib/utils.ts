@@ -1,5 +1,7 @@
 import {type ClassValue, clsx} from "clsx";
 import {twMerge} from "tailwind-merge";
+import {lastIndexOf} from "eslint-config-next";
+import {heicTo, isHeic} from "heic-to";
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -75,3 +77,42 @@ export function validateSize (size: number, maximumSize: number) {
     return size <= maximumSize;
 }
 
+const BYTE_UNITS = ["B", "KiB", "MiB", "GiB", "TiB"];
+
+/** 바이트를 KiB/MiB/GiB 등 1024 단위(binary prefix)로 환산해 읽기 좋은 문자열로 반환한다. */
+export function formatBytes (bytes: number, fractionDigits = 2) {
+    if (bytes < 0) {
+        throw new Error("bytes must be a non-negative number.");
+    }
+
+    if (bytes === 0) {
+        return "0 B";
+    }
+
+    const exponent = Math.min(
+        Math.floor(Math.log(bytes) / Math.log(1024)),
+        BYTE_UNITS.length - 1
+    );
+
+    const value = bytes / Math.pow(1024, exponent);
+
+    return `${value.toFixed(fractionDigits)} ${BYTE_UNITS[exponent]}`;
+}
+
+//File 객체의 이름에서 확장자를 제외한 이름을 추출한다.
+export function extractFileName (originalName: string) {
+    const lastIndex = originalName.lastIndexOf(".");
+    return lastIndex > -1 ? originalName.slice(0, lastIndex) : originalName;
+}
+
+export async function convertHeicToJpeg (file: File) {
+    const isFileHeic = await isHeic(file);
+
+    //isHeic()은 파일의 확장자나 MIME 타입을 넘어 파일 내용을 확인하여 heic인지 검사한다.
+    if (!isFileHeic) {
+        return file;
+    }
+    const heic = await heicTo({blob: file, type: "image/jpeg", quality: 0.85});
+
+    return new File([heic], extractFileName(file.name), {type: "image/jpeg"});
+}

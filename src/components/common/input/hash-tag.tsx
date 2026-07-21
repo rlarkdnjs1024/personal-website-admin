@@ -52,9 +52,9 @@ export function HashTagInput({hashtags, onChange, maxCount, minLength, maxLength
     }
 
     return (
-        <div>
+        <div className={"box-border p-1 border border-gray-500 rounded-lg"}>
             {hashtags.map(tag => (
-                <span key={tag} className="border border-black mr-0.5">
+                <span key={tag} className="border border-green-800 rounded-lg mr-0.5">
                     {"#"}{tag}
                     <button type="button" onClick={() => handleDelete(tag)}>
                         &#215;
