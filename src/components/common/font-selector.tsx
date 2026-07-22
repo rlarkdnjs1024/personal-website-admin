@@ -2,24 +2,23 @@ import {FONTS} from "@/fonts/fonts";
 import {cn} from "@/lib/utils";
 
 type FontSelectorProps = {
-    value: string;
-    onValueChange: (value: string) => void;
+    value: string|null;
+    onValueChange: (value: string|null) => void;
 }
 
 export function FontSelector({value, onValueChange}: FontSelectorProps) {
     return (
-        <div className="border w-full">
+        <div className="w-full rounded-xl box-border pt-3 pb-3 border w-full">
             {FONTS.map(font => (
-                <div key={font.id}>
+
                     <button
-                        className="w-full flex items-center hover:bg-gray-100 hover:cursor-pointer border-b-blue-800"
+                        key={font.id}
+                        className={cn("w-full box-border pl-2 pr-2 flex justify-between hover:bg-gray-100 hover:cursor-pointer",  value === font.id && "bg-gray-200")}
                         onClick={() => onValueChange(font.id)}
                     >
                         <span>{font.label}</span>
-                        <span className={cn("flex-1 text-center", font.className)}>Everything will be great in 2026</span>
-                        <span className="w-4 text-right">{value === font.id && <>&#10004;</>}</span>
+                        <span className={font.className}>AaBbCc1234</span>
                     </button>
-                </div>
             ))}
         </div>
     )

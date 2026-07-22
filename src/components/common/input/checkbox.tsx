@@ -10,11 +10,13 @@ type SingleCheckBoxProps = {
 
 export function SingleCheckBox({value, onValueChange, children}: SingleCheckBoxProps) {
     return (
-        <label>
+        <label className="flex items-center hover:cursor-pointer">
             <input
                 type={"checkbox"}
                 checked={value}
-                onChange={(e) => onValueChange(e.target.checked)} />
+                onChange={(e) => onValueChange(e.target.checked)}
+                className="mr-1 hover:cursor-pointer"
+            />
             {children}
         </label>
 
@@ -60,14 +62,14 @@ export function CheckBoxItem({itemValue, children}: CheckBoxItemProps) {
     }
 
     return (
-        <label>
+        <label className="flex items-center">
             <input
                 name={name}
                 type="checkbox"
                 checked={values.includes(itemValue)}
                 onChange={(e) => handleChange(itemValue, e.target.checked)}
             />
-            {children}
+            <span>{children}</span>
         </label>
 
     )

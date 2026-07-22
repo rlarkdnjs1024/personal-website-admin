@@ -58,7 +58,6 @@ export default function Home() {
           <div>
               사진 표기 날짜
           </div>
-          <DatePicker value={dateValue} onValueChange={setDateValue}/>
       </div>
 
           <div>
@@ -134,7 +133,6 @@ export default function Home() {
 
           <div>
               사진 선택
-              <ImageSelector name={"image"} file={image} onFileChange={setImage}/>
           </div>
 
           <div>

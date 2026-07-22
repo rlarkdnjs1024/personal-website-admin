@@ -7,6 +7,9 @@ import {TextInput} from "@/components/common/input/text-input";
 import {HashTagInput} from "@/components/common/input/hash-tag";
 import DatePicker from "@/components/common/input/date-input";
 import {SingleCheckBox} from "@/components/common/input/checkbox";
+import {cn, paginateList} from "@/lib/utils";
+import {Font, FONTS} from "@/fonts/fonts";
+import {Pagination} from "@/components/common/pagination";
 
 type DisplayStyleType = "REC_POLAROID" | "SQR_POLAROID" | "PHOTO"
 
@@ -18,9 +21,11 @@ export default function Home() {
     const [color, setColor] = useState<string>("#A6A59C1F");
     const [comment, setComment] = useState<string>("");
     const [hashTags, setHashTags] = useState<string[]>([]);
-    const [date, setDate] = useState<string>("2025-12-31");
+    const [date, setDate] = useState<string|null>(null);
     const [useAutoConvert, setUseAutoConvert] = useState<boolean>(true);
     const [useAutoAdjust, setUseAutoAdjust] = useState<boolean>(true);
+    const [font, setFont] = useState<Font|null>(null);
+    const [fontSelectorPage, setFontSelectorPage] = useState<number>(1);
 
     const policy: ImageSelectorPolicy  = {
         maximumBytes: 500 * 1024,
@@ -29,13 +34,16 @@ export default function Home() {
         useAutoAdjust,
     }
 
+    const PAGE_SIZE = 10;
+    const pagedResult = paginateList({sourceList: FONTS, pageSize: PAGE_SIZE, page: fontSelectorPage});
+
 
     return (
             <div className="h-full flex flex-row">
-                <section className="h-full flex-1 flex flex-col justify-between">
+                <section className="h-full flex-1 flex flex-col justify-between overflow-hidden">
                     <div
                         style={{backgroundColor: color}}
-                        className="w-[33%] [aspect-ratio:1/1.6] [container-type:inline-size] [rotate:3deg] m-auto px-[0.5%] pt-[1%] pb-[0.5%] bg-blue-50 shadow-[0_4px_4px_rgba(0,0,0,0.25)] overflow-hidden">
+                        className="w-[33%] [aspect-ratio:1/1.6] [container-type:inline-size] [rotate:3deg] m-auto px-[0.5%] pt-[1.5%] pb-[0.5%] bg-blue-50 shadow-[0_4px_4px_rgba(0,0,0,0.25)] overflow-hidden">
                         {
                             image === null ? (
                                 <div className="mb-[1%] block w-full aspect-[1/1.3] bg-gray-400"></div>
@@ -48,17 +56,21 @@ export default function Home() {
                             )
                         }
                         <div className="text-[7cqw] w-full">
-                            <span>
-                                {date}
-                                <br/>
-                            </span>
+                            { date && (
+                                <span>
+                                {date}<br/>
+                                </span>
+                                )
+                            }
+                            <span className={font?.className}>
                                 {comment}
+                            </span>
                         </div>
                     </div>
                 </section>
 
                 {/*사진 편집 도구 사이드바*/}
-                <aside className="w-[40%] h-full box-borer p-3 border border-gray-200 text-sm rounded-l-3xl">
+                <aside className="w-[40%] h-full overflow-scroll box-borer p-3 border border-gray-200 text-sm rounded-l-3xl">
                     <div className={"font-bold text-lg"}>Follow the instructions to style your photo</div>
 
                     <SideBarRow> Step 1. Choose the style of your image</SideBarRow>
@@ -85,10 +97,32 @@ export default function Home() {
                     <SideBarRow>Step 3. Color your Polaroid</SideBarRow>
                     <ColorPicker value={color} onValueChange={setColor} name={"color"}/>
 
-                    <SideBarRow>Step 4. Write a comment about your photo</SideBarRow>
+                    <SideBarRow>Step 4. Select a font</SideBarRow>
+                    <div className="w-full rounded-xl box-border pt-3 pb-3 border w-full">
+                        <Pagination
+                            currentPage={fontSelectorPage}
+                            onPageChange={setFontSelectorPage}
+                            actualSize={pagedResult.actualSize}
+                            totalPageCount={pagedResult.totalPageCount}
+                            totalDataLength={pagedResult.totalDataLength}
+                        >
+                            {pagedResult.pagedList.map(x => (
+                                <button
+                                    key={x.id}
+                                    className={cn("w-full box-border pl-2 pr-2 flex justify-between hover:bg-gray-100 hover:cursor-pointer",  font?.id === x.id && "bg-gray-200")}
+                                    onClick={() => setFont(x)}
+                                >
+                                    <span>{x.label}</span>
+                                    <span className={x.className}>AaBbCc1234</span>
+                                </button>
+                            ))}
+                        </Pagination>
+                    </div>
+
+                    <SideBarRow>Step 5. Write a comment about your photo</SideBarRow>
                     <TextInput name={"comment"} value={comment} onValueChange={setComment} maxLength={50} placeholder={"type something up to 50 characters"} />
 
-                    <SideBarRow>Step 5. Add additional information</SideBarRow>
+                    <SideBarRow>Step 6. Add additional information</SideBarRow>
                     <div className={"w-full box-border pr-2 pl-2"}>
                         <div>When was the photo taken? It will be marked on your calendar</div>
                         <DatePicker value={date} onValueChange={setDate}/>

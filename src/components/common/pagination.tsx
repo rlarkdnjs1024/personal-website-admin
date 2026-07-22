@@ -46,7 +46,8 @@ export function Pagination ({
     const displayButtonCount = buttonEnd - buttonStart + 1
 
     return (
-        <div className="flex flex-col border w-full min-h-[400px] ">
+        <>
+
             {children}
 
             {/*버튼 메뉴*/}
@@ -107,7 +108,7 @@ export function Pagination ({
                 )
             }
 
-        </div>
+        </>
 
     )
 }

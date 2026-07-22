@@ -1,15 +1,15 @@
 
 
 type DatePickerProps = {
-    value: string;
-    onValueChange: (value: string) => void;
+    value: string|null;
+    onValueChange: (value: string|null) => void;
 }
 
 export default function DatePicker({value, onValueChange}: DatePickerProps) {
     return (
         <input
             type="date"
-            value={value}
+            value={value ?? undefined}
             onChange={(e) => onValueChange(e.target.value)}
         />
     )

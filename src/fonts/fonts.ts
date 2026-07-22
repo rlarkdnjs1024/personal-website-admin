@@ -98,7 +98,15 @@ export const courierPrime = localFont({
     display: "swap",
 });
 
-export const FONTS = [
+export type Font = {
+    id: string,
+    label: string,
+    language: string,
+    className: string,
+}
+
+
+export const FONTS: Font[] = [
     {
         id: "RIBEYE",
         label: "ribeye",

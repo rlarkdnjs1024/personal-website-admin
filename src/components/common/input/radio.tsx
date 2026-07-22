@@ -33,15 +33,16 @@ export function RadioItem({itemValue, children}: RadioItemProps) {
     const {name, value, onValueChange} = groupContext;
 
     return (
-        <label>
+        <label className="hover:cursor-pointer flex justify-center items-center">
             <input
                 type="radio"
                 name={name}
                 value={itemValue}
                 onChange={() => onValueChange(itemValue)}
                 checked={value === itemValue}
+                className="hover:cursor-pointer mr-1"
             />
-            {children}
+            <span>{children}</span>
         </label>
 
     )
