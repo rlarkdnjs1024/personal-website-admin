@@ -10,6 +10,7 @@ import {
 import {useRef, useState} from "react";
 import {isHeic} from "heic-to";
 import imageCompression from "browser-image-compression";
+import * as exif from "exifr"
 
 type ImageSelectorProps = {
     name: string;
@@ -21,9 +22,18 @@ type ImageSelectorProps = {
 /** 업로드가 확정된 이미지 상태. 실제 전송에 쓰이는 File과 화면 표시용 메타데이터를 함께 담는다. */
 export type UploadImage = {
     originalFile: File,
+    uploadFile: File,
+
     originalName: string,
-    size: number,
-    dimension: ImageDimension,
+    uploadName: string,
+    uploadSize: number,
+    uploadDimension: ImageDimension,
+
+    originalLocation?: {
+        latitude: number,
+        longitude: number
+    },
+    originalDate?: Date,
     previewUrl: string,
 }
 
@@ -134,6 +144,24 @@ export function ImageSelector({name, file, onFileChange, policy}: ImageSelectorP
         setIsLoading(true);
 
         try {
+
+            //0. 변환 과정 전에 필요한 EXIF 정보들을 파싱한다.
+            let originalLocation, originalDate;
+            try {
+                const exifData = await exif.parse(inputFile);
+
+                if (exifData?.latitude !== undefined && exifData?.longitude !== undefined) {
+                    originalLocation = {
+                        latitude: exifData.latitude,
+                        longitude: exifData.longitude,
+                    }
+                }
+                originalDate = exifData?.DateTimeOriginal;
+            } catch (e) {
+                console.error("Failed to parse exif");
+                console.error(e);
+            }
+
             // 1. heic 여부 판단 후 필요하면 jpeg로 변환한다.
             //    MIME 타입/확장자는 브라우저마다 heic를 다르게 표기해서 신뢰할 수 없으므로,
             //    isHeic()으로 실제 파일 내용을 직접 검사해서 판단한다.
@@ -234,10 +262,14 @@ export function ImageSelector({name, file, onFileChange, policy}: ImageSelectorP
             }
 
             onFileChange({
-                originalFile: adjustedFile,
-                originalName: extractFileName(adjustedFile.name),
-                size: adjustedFile.size,
-                dimension: finalDimension,
+                originalFile: inputFile,
+                uploadFile: adjustedFile,
+                originalName: inputFile.name,
+                originalLocation: originalLocation,
+                originalDate: originalDate,
+                uploadName: adjustedFile.name,
+                uploadSize: adjustedFile.size,
+                uploadDimension: finalDimension,
                 previewUrl,
             });
         } finally {
@@ -292,7 +324,7 @@ export function ImageSelector({name, file, onFileChange, policy}: ImageSelectorP
                 </div>
                 <div className="flex flex-col items-center justify-center">
                     <div>{file.originalName}</div>
-                    <div>{file.dimension.width} x {file.dimension.height} ({formatBytes(file.size)})</div>
+                    <div>{file.uploadDimension.width} x {file.uploadDimension.height} ({formatBytes(file.uploadSize)})</div>
                 </div>
             </div>
         );

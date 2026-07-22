@@ -116,6 +116,9 @@ export async function convertHeicToJpeg (file: File) {
         return file;
     }
     const heic = await heicTo({blob: file, type: "image/jpeg", quality: 0.85});
+    const newName = file.name.replace(/\.[^.]+$/, ".jpg");
 
-    return new File([heic], extractFileName(file.name), {type: "image/jpeg"});
+    return new File([heic], newName, {type: "image/jpeg"});
 }
+
+

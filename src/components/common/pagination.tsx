@@ -77,7 +77,7 @@ export function Pagination ({
                             key={i}
                             className={cn(
                                 "rounded border px-2 py-1 cursor-pointer hover:bg-gray-100",
-                                currentPage === i && "bg-gray-800 text-white border-gray-800 hover:bg-gray-800"
+                                currentPage === i && "bg-green-900 text-white border-gray-800 hover:bg-gray-800"
                             )}
                             onClick={() => onPageChange(i)}
                         >

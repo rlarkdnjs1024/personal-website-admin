@@ -10,6 +10,8 @@ import {SingleCheckBox} from "@/components/common/input/checkbox";
 import {cn, paginateList} from "@/lib/utils";
 import {Font, FONTS} from "@/fonts/fonts";
 import {Pagination} from "@/components/common/pagination";
+import {Button} from "@/components/common/button";
+import * as exifr from "exifr";
 
 type DisplayStyleType = "REC_POLAROID" | "SQR_POLAROID" | "PHOTO"
 
@@ -37,6 +39,23 @@ export default function Home() {
     const PAGE_SIZE = 10;
     const pagedResult = paginateList({sourceList: FONTS, pageSize: PAGE_SIZE, page: fontSelectorPage});
 
+    async function handleUseExifButtonClick () {
+        if (!image) {
+            return;
+        }
+
+        const date = image.originalDate;
+
+        if (!date) {
+            window.alert("No date info in exif");
+            return;
+        }
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        setDate(`${year}-${month}-${day}`);
+    }
+
 
     return (
             <div className="h-full flex flex-row">
@@ -56,12 +75,6 @@ export default function Home() {
                             )
                         }
                         <div className="text-[7cqw] w-full">
-                            { date && (
-                                <span>
-                                {date}<br/>
-                                </span>
-                                )
-                            }
                             <span className={font?.className}>
                                 {comment}
                             </span>
@@ -70,7 +83,7 @@ export default function Home() {
                 </section>
 
                 {/*사진 편집 도구 사이드바*/}
-                <aside className="w-[40%] h-full overflow-scroll box-borer p-3 border border-gray-200 text-sm rounded-l-3xl">
+                <aside className="w-[40%] h-full overflow-scroll box-borer p-3 pb-50 border border-gray-200 text-sm rounded-l-3xl">
                     <div className={"font-bold text-lg"}>Follow the instructions to style your photo</div>
 
                     <SideBarRow> Step 1. Choose the style of your image</SideBarRow>
@@ -98,7 +111,7 @@ export default function Home() {
                     <ColorPicker value={color} onValueChange={setColor} name={"color"}/>
 
                     <SideBarRow>Step 4. Select a font</SideBarRow>
-                    <div className="w-full rounded-xl box-border pt-3 pb-3 border w-full">
+                    <div className="w-full rounded-xl box-border pt-3 pb-3 border border-green-900">
                         <Pagination
                             currentPage={fontSelectorPage}
                             onPageChange={setFontSelectorPage}
@@ -126,7 +139,8 @@ export default function Home() {
                     <div className={"w-full box-border pr-2 pl-2"}>
                         <div>When was the photo taken? It will be marked on your calendar</div>
                         <DatePicker value={date} onValueChange={setDate}/>
-                        <button className="" >use date info of photo</button>
+
+                        {image && (<Button onClick={() => handleUseExifButtonClick()}>use exif data</Button>)}
 
                         <div>Add hashtags that can be used to search.</div>
                         <div>
@@ -144,3 +158,5 @@ export default function Home() {
         <div className={"font-bold pb-2 pt-4"}>{children}</div>
         )
     }
+
+
