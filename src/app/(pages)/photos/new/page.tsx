@@ -23,7 +23,7 @@ export default function Home() {
     const [color, setColor] = useState<string>("#A6A59C1F");
     const [comment, setComment] = useState<string>("");
     const [hashTags, setHashTags] = useState<string[]>([]);
-    const [date, setDate] = useState<string|null>(null);
+    const [date, setDate] = useState<string>("");
     const [useAutoConvert, setUseAutoConvert] = useState<boolean>(true);
     const [useAutoAdjust, setUseAutoAdjust] = useState<boolean>(true);
     const [font, setFont] = useState<Font|null>(null);

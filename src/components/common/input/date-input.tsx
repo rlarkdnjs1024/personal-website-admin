@@ -1,8 +1,8 @@
 
 
 type DatePickerProps = {
-    value: string|null;
-    onValueChange: (value: string|null) => void;
+    value: string;
+    onValueChange: (value: string) => void;
 }
 
 export default function DatePicker({value, onValueChange}: DatePickerProps) {
