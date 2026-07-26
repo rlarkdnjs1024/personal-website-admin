@@ -2,7 +2,7 @@ import {ReactNode} from "react";
 
 export type ButtonProps = {
     onClick: () => void,
-    children: ReactNode
+    children?: ReactNode
 }
 
 export function Button({onClick, children}: ButtonProps) {

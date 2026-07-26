@@ -10,7 +10,7 @@ import {useRef, useState} from "react";
 import {isHeic} from "heic-to";
 import imageCompression from "browser-image-compression";
 import * as exif from "exifr"
-import LatLngLiteral = google.maps.LatLngLiteral;
+import {LatLngLiteral} from "@/types";
 
 type ImageSelectorProps = {
     name: string;

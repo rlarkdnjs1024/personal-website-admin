@@ -1,4 +1,8 @@
-import LatLngLiteral = google.maps.LatLngLiteral;
+
+export type LatLngLiteral = {
+    lat: number,
+    lng: number
+}
 
 export const DefaultGeoLocation: LatLngLiteral = {
     lat: 51,

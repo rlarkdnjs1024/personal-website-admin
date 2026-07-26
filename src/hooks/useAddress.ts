@@ -1,11 +1,22 @@
-import {useEffect, useState} from "react";
+"use client"
+
+import {useEffect, useMemo, useState} from "react";
 import LatLngLiteral = google.maps.LatLngLiteral;
+import {useMapsLibrary} from "@vis.gl/react-google-maps";
 
 export function useAddress(location: LatLngLiteral) {
     const [address, setAddress] = useState<string|null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const geocodingLib = useMapsLibrary("geocoding");
+
+    const geocoder = useMemo(() => {
+        if (!geocodingLib) return null;
+        return new geocodingLib.Geocoder();
+    }, [geocodingLib]);
 
     useEffect(() => {
+        if (!geocoder) return;
+
         let cancelled = false;
 
         async function loadAddress() {

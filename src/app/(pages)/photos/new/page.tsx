@@ -11,10 +11,10 @@ import {cn, paginateList} from "@/lib/utils";
 import {Font, FONTS} from "@/fonts/fonts";
 import {Pagination} from "@/components/common/pagination";
 import {Button} from "@/components/common/button";
-import {Map, MapMouseEvent} from "@vis.gl/react-google-maps";
-import {DefaultGeoLocation} from "@/types";
+import {MapMouseEvent} from "@vis.gl/react-google-maps";
+import {Map} from '@/components/common/google-map'
+import {DefaultGeoLocation, LatLngLiteral} from "@/types";
 import {Marker} from "@/components/common/google-map";
-import LatLngLiteral = google.maps.LatLngLiteral;
 import {useAddress} from "@/hooks/useAddress";
 
 type DisplayStyleType = "REC_POLAROID" | "SQR_POLAROID" | "PHOTO"
@@ -134,7 +134,8 @@ export default function Home() {
                             <Map
                                 disableDefaultUI
                                 mapId="personal-website"
-                                className="w-[50%] aspect-square m-auto"
+                                className="w-[80%] aspect-square m-auto pt-3"
+                                focusLocation={location}
                                 defaultZoom={19}
                                 defaultCenter={location}
                                 onClick={handleMapClick}
