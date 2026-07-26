@@ -1,7 +1,6 @@
 import {
     cn,
     convertHeicToJpeg,
-    extractFileName,
     formatBytes,
     validateFileType,
     validateImageDimension,
@@ -11,6 +10,7 @@ import {useRef, useState} from "react";
 import {isHeic} from "heic-to";
 import imageCompression from "browser-image-compression";
 import * as exif from "exifr"
+import LatLngLiteral = google.maps.LatLngLiteral;
 
 type ImageSelectorProps = {
     name: string;
@@ -29,10 +29,7 @@ export type UploadImage = {
     uploadSize: number,
     uploadDimension: ImageDimension,
 
-    originalLocation?: {
-        latitude: number,
-        longitude: number
-    },
+    originalLocation?: LatLngLiteral,
     originalDate?: Date,
     previewUrl: string,
 }
@@ -152,8 +149,8 @@ export function ImageSelector({name, file, onFileChange, policy}: ImageSelectorP
 
                 if (exifData?.latitude !== undefined && exifData?.longitude !== undefined) {
                     originalLocation = {
-                        latitude: exifData.latitude,
-                        longitude: exifData.longitude,
+                        lat: exifData.latitude,
+                        lng: exifData.longitude,
                     }
                 }
                 originalDate = exifData?.DateTimeOriginal;

@@ -1,5 +1,5 @@
 "use client"
-import {ReactNode, useState} from "react";
+import {ReactNode, useEffect, useState} from "react";
 import {RadioGroup, RadioItem} from "@/components/common/input/radio";
 import {ImageSelector, ImageSelectorPolicy, UploadImage} from "@/components/common/image-selector";
 import {ColorPicker} from "@/components/common/color-picker";
@@ -11,7 +11,10 @@ import {cn, paginateList} from "@/lib/utils";
 import {Font, FONTS} from "@/fonts/fonts";
 import {Pagination} from "@/components/common/pagination";
 import {Button} from "@/components/common/button";
-import * as exifr from "exifr";
+import {Map, MapMouseEvent} from "@vis.gl/react-google-maps";
+import {DefaultGeoLocation} from "@/types";
+import {Marker} from "@/components/common/google-map";
+import LatLngLiteral = google.maps.LatLngLiteral;
 
 type DisplayStyleType = "REC_POLAROID" | "SQR_POLAROID" | "PHOTO"
 
@@ -28,6 +31,38 @@ export default function Home() {
     const [useAutoAdjust, setUseAutoAdjust] = useState<boolean>(true);
     const [font, setFont] = useState<Font|null>(null);
     const [fontSelectorPage, setFontSelectorPage] = useState<number>(1);
+    const [location, setLocation] = useState<LatLngLiteral>(DefaultGeoLocation);
+    const [address, setAddress ] = useState<string|null>(null);
+    const [isAddressLoading, setIsAddressLoading] = useState(false);
+
+    useEffect(() => {
+        let cancelled = false;
+
+        async function loadAddress() {
+            setIsAddressLoading(true);
+
+            try {
+                const geocoder = new google.maps.Geocoder();
+                const response = await geocoder.geocode({location});
+                if (cancelled) return;
+                setAddress(response.results[0]?.formatted_address ?? "");
+            } catch (e) {
+                if (cancelled) return;
+                console.error("주소 변환 실패:", e);
+                setAddress("");
+            } finally {
+                if (!cancelled) {
+                    setIsAddressLoading(false);
+                }
+            }
+        }
+
+        //useEffect에서 비동기 작업을 await하지 않는다. useEffect는 함수를 실행만 시키고 종료된다. 이후 비동기 함수에서 await이 발생하고 state을 변경시켜 re-render한다.
+        loadAddress();
+        return () => {
+            cancelled = true;
+        }
+    }, [location]);
 
     const policy: ImageSelectorPolicy  = {
         maximumBytes: 500 * 1024,
@@ -38,6 +73,23 @@ export default function Home() {
 
     const PAGE_SIZE = 10;
     const pagedResult = paginateList({sourceList: FONTS, pageSize: PAGE_SIZE, page: fontSelectorPage});
+
+    function handleImageChange(image: UploadImage|null) {
+        setImage(image);
+
+        if (image !== null && image.originalLocation !== undefined) {
+            setLocation({
+                lat: image.originalLocation.lat,
+                lng: image.originalLocation.lng,
+            });
+        }
+    }
+
+    function handleMapClick (event: MapMouseEvent) {
+        const clickedPosition = event.detail.latLng;
+        if (!clickedPosition) return;
+        setLocation({...clickedPosition});
+    }
 
     async function handleUseExifButtonClick () {
         if (!image) {
@@ -105,7 +157,26 @@ export default function Home() {
                         </div>
                     </div>
 
-                    <ImageSelector name={"image"} file={image} onFileChange={setImage} policy={policy} />
+                    <ImageSelector name={"image"} file={image} onFileChange={handleImageChange} policy={policy} />
+
+                    {image !== null && (
+                        <>
+                            <Map
+                                disableDefaultUI
+                                mapId="personal-website"
+                                className="w-[50%] aspect-square m-auto"
+                                defaultZoom={19}
+                                defaultCenter={location}
+                                onClick={handleMapClick}
+                            >
+                                <Marker
+                                    location={location}
+                                />
+                            </Map>
+                            <div>{isAddressLoading ? "loading address..." : address}</div>
+                        </>
+
+                    )}
 
                     <SideBarRow>Step 3. Color your Polaroid</SideBarRow>
                     <ColorPicker value={color} onValueChange={setColor} name={"color"}/>
@@ -146,7 +217,6 @@ export default function Home() {
                         <div>
                             <HashTagInput hashtags={hashTags} onChange={setHashTags} />
                         </div>
-
                     </div>
                 </aside>
             </div>
