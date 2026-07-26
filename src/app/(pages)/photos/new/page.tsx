@@ -15,11 +15,11 @@ import {Map, MapMouseEvent} from "@vis.gl/react-google-maps";
 import {DefaultGeoLocation} from "@/types";
 import {Marker} from "@/components/common/google-map";
 import LatLngLiteral = google.maps.LatLngLiteral;
+import {useAddress} from "@/hooks/useAddress";
 
 type DisplayStyleType = "REC_POLAROID" | "SQR_POLAROID" | "PHOTO"
 
 export default function Home() {
-
 
     const [displayStyle, setDisplayStyle] = useState<string>("REC_POLAROID");
     const [image, setImage] = useState<UploadImage|null>(null);
@@ -32,37 +32,7 @@ export default function Home() {
     const [font, setFont] = useState<Font|null>(null);
     const [fontSelectorPage, setFontSelectorPage] = useState<number>(1);
     const [location, setLocation] = useState<LatLngLiteral>(DefaultGeoLocation);
-    const [address, setAddress ] = useState<string|null>(null);
-    const [isAddressLoading, setIsAddressLoading] = useState(false);
-
-    useEffect(() => {
-        let cancelled = false;
-
-        async function loadAddress() {
-            setIsAddressLoading(true);
-
-            try {
-                const geocoder = new google.maps.Geocoder();
-                const response = await geocoder.geocode({location});
-                if (cancelled) return;
-                setAddress(response.results[0]?.formatted_address ?? "");
-            } catch (e) {
-                if (cancelled) return;
-                console.error("주소 변환 실패:", e);
-                setAddress("");
-            } finally {
-                if (!cancelled) {
-                    setIsAddressLoading(false);
-                }
-            }
-        }
-
-        //useEffect에서 비동기 작업을 await하지 않는다. useEffect는 함수를 실행만 시키고 종료된다. 이후 비동기 함수에서 await이 발생하고 state을 변경시켜 re-render한다.
-        loadAddress();
-        return () => {
-            cancelled = true;
-        }
-    }, [location]);
+    const {address, isLoading} = useAddress(location);
 
     const policy: ImageSelectorPolicy  = {
         maximumBytes: 500 * 1024,
@@ -173,7 +143,7 @@ export default function Home() {
                                     location={location}
                                 />
                             </Map>
-                            <div>{isAddressLoading ? "loading address..." : address}</div>
+                            <div>{isLoading ? "loading address..." : address}</div>
                         </>
 
                     )}
