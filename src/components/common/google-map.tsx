@@ -1,5 +1,7 @@
 import {AdvancedMarker, Pin} from "@vis.gl/react-google-maps";
 import LatLngLiteral = google.maps.LatLngLiteral;
+import {Map as MapPrimitive, MapMouseEvent} from "@vis.gl/react-google-maps";
+import {ReactNode} from "react";
 
 type MarkerProps = {
     location: LatLngLiteral,
@@ -25,5 +27,42 @@ export function Marker({location, onClick, background, glyphColor, borderColor}:
         >
             <Pin background={background} glyphColor={glyphColor} borderColor={borderColor} />
         </AdvancedMarker>
+    )
+}
+
+type MapProps = {
+    mapId: string,
+    defaultZoom: number,
+    defaultCenter: LatLngLiteral,
+    children: ReactNode,
+    onClick?: () => void,
+    className?: string,
+    disableDefaultUI?: boolean,
+}
+
+export function Map({
+    mapId,
+    defaultZoom,
+    defaultCenter,
+    children,
+    onClick,
+    className,
+    disableDefaultUI,
+                    }: MapProps): ReactNode {
+    return (
+        <div>
+            <MapPrimitive
+                disableDefaultUI
+                mapId={mapId}
+                className={className}
+                defaultZoom={defaultZoom}
+                defaultCenter={defaultCenter}
+                onClick={onClick}
+            >
+                {children}
+            </MapPrimitive>
+
+        </div>
+
     )
 }

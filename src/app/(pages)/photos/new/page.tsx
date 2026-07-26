@@ -1,5 +1,5 @@
 "use client"
-import {ReactNode, useEffect, useState} from "react";
+import {ReactNode, useState} from "react";
 import {RadioGroup, RadioItem} from "@/components/common/input/radio";
 import {ImageSelector, ImageSelectorPolicy, UploadImage} from "@/components/common/image-selector";
 import {ColorPicker} from "@/components/common/color-picker";
@@ -149,6 +149,7 @@ export default function Home() {
                     )}
 
                     <SideBarRow>Step 3. Color your Polaroid</SideBarRow>
+                    {/*TODO: color picker 재사용 가능하게 분리*/}
                     <ColorPicker value={color} onValueChange={setColor} name={"color"}/>
 
                     <SideBarRow>Step 4. Select a font</SideBarRow>
