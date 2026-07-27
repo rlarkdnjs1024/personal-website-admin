@@ -78,7 +78,7 @@ export default function Home() {
 
     return (
             <div className="h-full flex flex-row">
-                <section className="h-full flex-1 flex flex-col justify-between overflow-hidden">
+                <section className="h-full flex-1 flex flex-col justify-between">
                     <div
                         style={{backgroundColor: color}}
                         className="w-[33%] [aspect-ratio:1/1.6] [container-type:inline-size] [rotate:3deg] m-auto px-[0.5%] pt-[1.5%] pb-[0.5%] bg-blue-50 shadow-[0_4px_4px_rgba(0,0,0,0.25)] overflow-hidden">
@@ -102,7 +102,7 @@ export default function Home() {
                 </section>
 
                 {/*사진 편집 도구 사이드바*/}
-                <aside className="w-[40%] h-full overflow-scroll box-borer p-3 pb-50 border border-gray-200 text-sm rounded-l-3xl">
+                <aside className="w-[40%] h-full overflow-y-scroll box-borer p-3 pb-50 border border-gray-200 text-sm rounded-l-3xl">
                     <div className={"font-bold text-lg"}>Follow the instructions to style your photo</div>
 
                     <SideBarRow title={"Step 1. Choose the style of your image"}>
@@ -141,7 +141,7 @@ export default function Home() {
                         </button>
 
                         {isLocationPickerOpen && (
-                            <div className="w-full box-border rounded-xl border border-gray-200 bg-white p-3 shadow-xl absolute z-50">
+                            <div className="w-full box-border rounded-xl border border-gray-200 bg-white p-3 shadow-xl absolute z-50 top-full">
                                 <div className="mb-2 flex justify-end">
                                     <button
                                         onClick={() => setIsLocationPickerOpen(false)}
