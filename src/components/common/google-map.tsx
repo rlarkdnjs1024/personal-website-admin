@@ -3,6 +3,7 @@ import LatLngLiteral = google.maps.LatLngLiteral;
 import {Map as MapPrimitive, MapMouseEvent} from "@vis.gl/react-google-maps";
 import {ReactNode, useEffect, useRef, useState} from "react";
 import {Button} from "@/components/common/button";
+import {useFullScreen} from "@/hooks/useFullScreen";
 
 type MarkerProps = {
     location: LatLngLiteral,
@@ -52,41 +53,9 @@ export function Map({
                         className,
                         disableDefaultUI,
                     }: MapProps): React.ReactNode {
-    const [isFullscreen, setIsFullscreen] = useState(false);
+
     const wrapperRef = useRef<HTMLDivElement>(null);
-
-    async function toggleFullscreen() {
-        const wrapper = wrapperRef.current;
-
-        if (!wrapper) return;
-
-        if (document.fullscreenElement === wrapper) {
-            await document.exitFullscreen();
-            return;
-        }
-
-        await wrapper.requestFullscreen();
-    }
-
-    useEffect(() => {
-        function handleFullscreenChange() {
-            setIsFullscreen(
-                document.fullscreenElement === wrapperRef.current
-            );
-        }
-
-        document.addEventListener(
-            "fullscreenchange",
-            handleFullscreenChange
-        );
-
-        return () => {
-            document.removeEventListener(
-                "fullscreenchange",
-                handleFullscreenChange
-            );
-        };
-    }, []);
+    const {isFullScreen, toggleFullScreen} = useFullScreen(wrapperRef);
 
     return (
         <div
@@ -109,8 +78,8 @@ export function Map({
                         />
 
                         <ToggleFullscreenButton
-                            isFullscreen={isFullscreen}
-                            onToggle={toggleFullscreen}
+                            isFullScreen={isFullScreen}
+                            onToggle={toggleFullScreen}
                         />
                     </div>
                 </MapControl>
@@ -128,21 +97,21 @@ function FocusButton({focusLocation,}: { focusLocation: google.maps.LatLngLitera
     }
 
     return (
-        <Button onClick={handleButtonClick}>
+        <Button onClick={handleButtonClick} className={"bg-[#FFFFFFB3] border-0 rounded-md"}>
             focus
         </Button>
     );
 }
 
 type ToggleFullscreenButtonProps = {
-    isFullscreen: boolean;
+    isFullScreen: boolean;
     onToggle: () => Promise<void>;
 };
 
-function ToggleFullscreenButton({isFullscreen, onToggle,}: ToggleFullscreenButtonProps): React.ReactNode {
+function ToggleFullscreenButton({isFullScreen, onToggle,}: ToggleFullscreenButtonProps): React.ReactNode {
     return (
-        <Button onClick={onToggle}>
-            {isFullscreen ? "전체화면 종료" : "전체화면"}
+        <Button onClick={onToggle} className={"bg-[#FFFFFFB3] border-0 rounded-md"}>
+            {isFullScreen ? "exit full screen" : "full screen"}
         </Button>
     );
 }

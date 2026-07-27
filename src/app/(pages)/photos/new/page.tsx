@@ -130,11 +130,11 @@ export default function Home() {
                     <ImageSelector name={"image"} file={image} onFileChange={handleImageChange} policy={policy} />
 
                     {image !== null && (
-                        <>
+                        <div className="flex">
                             <Map
                                 disableDefaultUI
                                 mapId="personal-website"
-                                className="w-[80%] aspect-square m-auto pt-3"
+                                className="w-[50%] aspect-square"
                                 focusLocation={location}
                                 defaultZoom={19}
                                 defaultCenter={location}
@@ -144,8 +144,8 @@ export default function Home() {
                                     location={location}
                                 />
                             </Map>
-                            <div>{isLoading ? "loading address..." : address}</div>
-                        </>
+                            <div className="flex-1">{isLoading ? "loading address..." : address}</div>
+                        </div>
 
                     )}
 
