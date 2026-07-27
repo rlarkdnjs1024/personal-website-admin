@@ -7,13 +7,16 @@ type RadioGroupProps = {
     onValueChange: (value: string) => void;
     children: React.ReactNode;
     errorMessage?: string;
+    className?: string;
 }
 
-export function RadioGroup({name, value, onValueChange, children}: RadioGroupProps) {
+export function RadioGroup({name, value, onValueChange, children, className}: RadioGroupProps) {
     return (
+        <div className={className}>
             <RadioGroupContext value={{name, value, onValueChange: onValueChange}}>
                 {children}
             </RadioGroupContext>
+        </div>
 
     )
 }

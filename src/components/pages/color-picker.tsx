@@ -28,7 +28,6 @@ const DEFAULT_COLORS = [
 type ColorPickerProps = {
     value: string,
     onValueChange: (value: string) => void,
-
     name: string,
 }
 

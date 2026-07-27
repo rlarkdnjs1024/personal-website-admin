@@ -10,7 +10,7 @@ import {FONTS} from "@/fonts/fonts";
 import {cn} from "@/lib/utils";
 import {Pagination} from "@/components/common/pagination";
 import {paginateList} from "@/lib/utils";
-import {ColorPicker} from "@/components/common/color-picker";
+import {ColorPicker} from "@/components/pages/color-picker";
 import {ImageSelector, UploadImage} from "@/components/common/image-selector";
 
 

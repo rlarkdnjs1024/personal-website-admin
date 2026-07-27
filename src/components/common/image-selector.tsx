@@ -276,7 +276,7 @@ export function ImageSelector({name, file, onFileChange, policy}: ImageSelectorP
     }
 
     // 세 가지 상태(로딩 중 / 빈 상태 / 파일 선택됨)가 공유하는 바깥 박스 스타일
-    const boxBaseClass = "bg-gray-200 w-[95%] h-20 box-border p-2 border border-green-900 border-dashed m-auto rounded-xl";
+    const boxBaseClass = "bg-gray-200 w-full h-20 box-border p-2 border border-green-900 border-dashed m-auto rounded-xl";
 
     function renderBox() {
         if (isLoading) {

@@ -72,7 +72,7 @@ export function Map({
                 {children}
 
                 <MapControl position={ControlPosition.TOP_RIGHT}>
-                    <div className="flex gap-2">
+                    <div className="flex">
                         <FocusButton
                             focusLocation={focusLocation}
                         />
@@ -97,7 +97,7 @@ function FocusButton({focusLocation,}: { focusLocation: google.maps.LatLngLitera
     }
 
     return (
-        <Button onClick={handleButtonClick} className={"bg-[#FFFFFFB3] border-0 rounded-md"}>
+        <Button onClick={handleButtonClick} className={"bg-[#FFFFFFB3] rounded-md p-2"}>
             focus
         </Button>
     );
@@ -110,7 +110,7 @@ type ToggleFullscreenButtonProps = {
 
 function ToggleFullscreenButton({isFullScreen, onToggle,}: ToggleFullscreenButtonProps): React.ReactNode {
     return (
-        <Button onClick={onToggle} className={"bg-[#FFFFFFB3] border-0 rounded-md"}>
+        <Button onClick={onToggle} className={"bg-[#FFFFFFB3] rounded-md p-2"}>
             {isFullScreen ? "exit full screen" : "full screen"}
         </Button>
     );

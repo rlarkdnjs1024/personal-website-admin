@@ -2,7 +2,7 @@
 import {ReactNode, useState} from "react";
 import {RadioGroup, RadioItem} from "@/components/common/input/radio";
 import {ImageSelector, ImageSelectorPolicy, UploadImage} from "@/components/common/image-selector";
-import {ColorPicker} from "@/components/common/color-picker";
+import {ColorPicker} from "@/components/pages/color-picker";
 import {TextInput} from "@/components/common/input/text-input";
 import {HashTagInput} from "@/components/common/input/hash-tag";
 import DatePicker from "@/components/common/input/date-input";
@@ -32,6 +32,7 @@ export default function Home() {
     const [font, setFont] = useState<Font|null>(null);
     const [fontSelectorPage, setFontSelectorPage] = useState<number>(1);
     const [location, setLocation] = useState<LatLngLiteral>(DefaultGeoLocation);
+    const [isLocationPickerOpen, setIsLocationPickerOpen] = useState<boolean>(false);
     const {address, isLoading} = useAddress(location);
 
     const policy: ImageSelectorPolicy  = {
@@ -66,12 +67,8 @@ export default function Home() {
             return;
         }
 
-        const date = image.originalDate;
+        const date = image.originalDate as Date;
 
-        if (!date) {
-            window.alert("No date info in exif");
-            return;
-        }
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, "0");
         const day = String(date.getDate()).padStart(2, "0");
@@ -108,96 +105,138 @@ export default function Home() {
                 <aside className="w-[40%] h-full overflow-scroll box-borer p-3 pb-50 border border-gray-200 text-sm rounded-l-3xl">
                     <div className={"font-bold text-lg"}>Follow the instructions to style your photo</div>
 
-                    <SideBarRow> Step 1. Choose the style of your image</SideBarRow>
-                    <div className={"flex items-center justify-between pl-2 pr-2 box-border"}>
-                        <RadioGroup name={"display-style"} value={displayStyle} onValueChange={setDisplayStyle}>
+                    <SideBarRow title={"Step 1. Choose the style of your image"}>
+                        <RadioGroup
+                            name={"display-style"}
+                            value={displayStyle}
+                            onValueChange={setDisplayStyle}
+                            className="flex justify-between"
+                        >
                             <RadioItem itemValue={"REC_POLAROID"}>Rectangular polaroid</RadioItem>
                             <RadioItem itemValue={"SQR_POLAROID"}>Square polaroid</RadioItem>
                             <RadioItem itemValue={"PHOTO"}>Photo</RadioItem>
                         </RadioGroup>
-                    </div>
+                    </SideBarRow>
 
-                    <SideBarRow>Step 2. Select your image</SideBarRow>
-                    <div className="pb-2">
-                        <div>
+
+                    <SideBarRow title={"Step 2. Select your image"}>
+                        <div className="pb-2">
                             <SingleCheckBox value={useAutoConvert} onValueChange={setUseAutoConvert}>Auto convert .heic to.jpg</SingleCheckBox>
-                        </div>
-                        <div >
                             <SingleCheckBox value={useAutoAdjust} onValueChange={setUseAutoAdjust}>Adjust image size and dimension</SingleCheckBox>
                         </div>
-                    </div>
+                        <ImageSelector name={"image"} file={image} onFileChange={handleImageChange} policy={policy} />
+                    </SideBarRow>
 
-                    <ImageSelector name={"image"} file={image} onFileChange={handleImageChange} policy={policy} />
-
-                    {image !== null && (
-                        <div className="flex">
-                            <Map
-                                disableDefaultUI
-                                mapId="personal-website"
-                                className="w-[50%] aspect-square"
-                                focusLocation={location}
-                                defaultZoom={19}
-                                defaultCenter={location}
-                                onClick={handleMapClick}
-                            >
-                                <Marker
-                                    location={location}
-                                />
-                            </Map>
-                            <div className="flex-1">{isLoading ? "loading address..." : address}</div>
-                        </div>
-
-                    )}
-
-                    <SideBarRow>Step 3. Color your Polaroid</SideBarRow>
-                    {/*TODO: color picker 재사용 가능하게 분리*/}
-                    <ColorPicker value={color} onValueChange={setColor} name={"color"}/>
-
-                    <SideBarRow>Step 4. Select a font</SideBarRow>
-                    <div className="w-full rounded-xl box-border pt-3 pb-3 border border-green-900">
-                        <Pagination
-                            currentPage={fontSelectorPage}
-                            onPageChange={setFontSelectorPage}
-                            actualSize={pagedResult.actualSize}
-                            totalPageCount={pagedResult.totalPageCount}
-                            totalDataLength={pagedResult.totalDataLength}
+                    <SideBarRow
+                        title={"Step 3. Where was the photo taken?"}
+                        description={"*If you add a location, you will be able to find it in your map."}
+                        className="relative"
+                    >
+                        <span>{"Location: "}</span>
+                        <button
+                            type="button"
+                            onClick={() => setIsLocationPickerOpen(!isLocationPickerOpen)}
                         >
-                            {pagedResult.pagedList.map(x => (
-                                <button
-                                    key={x.id}
-                                    className={cn("w-full box-border pl-2 pr-2 flex justify-between hover:bg-gray-100 hover:cursor-pointer",  font?.id === x.id && "bg-gray-200")}
-                                    onClick={() => setFont(x)}
+                            <span className="underline">{address ? address : isLoading ? "Loading address..." : "Address unavailable. Click to open map."}</span>
+                        </button>
+
+                        {isLocationPickerOpen && (
+                            <div className="w-full box-border rounded-xl border border-gray-200 bg-white p-3 shadow-xl absolute z-50">
+                                <div className="mb-2 flex justify-end">
+                                    <button
+                                        onClick={() => setIsLocationPickerOpen(false)}
+                                        className="flex h-5 w-5 cursor-pointer items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                                    >
+                                        ✕
+                                    </button>
+                                </div>
+                                <Map
+                                    disableDefaultUI
+                                    mapId="personal-website"
+                                    className="w-full aspect-square m-auto"
+                                    focusLocation={location}
+                                    defaultZoom={10}
+                                    defaultCenter={location}
+                                    onClick={handleMapClick}
                                 >
-                                    <span>{x.label}</span>
-                                    <span className={x.className}>AaBbCc1234</span>
-                                </button>
-                            ))}
-                        </Pagination>
-                    </div>
+                                    <Marker
+                                        location={location}
+                                    />
+                                </Map>
+                            </div>
+                        )}
 
-                    <SideBarRow>Step 5. Write a comment about your photo</SideBarRow>
-                    <TextInput name={"comment"} value={comment} onValueChange={setComment} maxLength={50} placeholder={"type something up to 50 characters"} />
+                    </SideBarRow>
 
-                    <SideBarRow>Step 6. Add additional information</SideBarRow>
-                    <div className={"w-full box-border pr-2 pl-2"}>
-                        <div>When was the photo taken? It will be marked on your calendar</div>
-                        <DatePicker value={date} onValueChange={setDate}/>
-
-                        {image && (<Button onClick={() => handleUseExifButtonClick()}>use exif data</Button>)}
-
-                        <div>Add hashtags that can be used to search.</div>
-                        <div>
-                            <HashTagInput hashtags={hashTags} onChange={setHashTags} />
+                    <SideBarRow
+                        title={"Step 4. When was the photo taken?"}
+                        description={"*The photo will be marked on your calendar"}
+                    >
+                        <div className={"flex justify-between"}>
+                            <DatePicker value={date} onValueChange={setDate}/>
+                            {image?.originalDate && (<Button onClick={() => handleUseExifButtonClick()}>use exif data</Button>)}
                         </div>
-                    </div>
+
+                    </SideBarRow>
+
+                    <SideBarRow
+                        title={"Step 5. Color your Polaroid"}
+                    >
+                        {/*/!*TODO: color picker 재사용 가능하게 분리*!/*/}
+                        <ColorPicker value={color} onValueChange={setColor} name={"color"}/>
+                    </SideBarRow>
+
+                    <SideBarRow title="Step 6. Write a comment about your photo">
+                        <TextInput name={"comment"} value={comment} onValueChange={setComment} maxLength={50} placeholder={"type something up to 50 characters"} />
+                    </SideBarRow>
+
+                    <SideBarRow
+                        title={"Step 7. Select a font of your choice"}
+                    >
+                        <div className="w-full rounded-xl box-border pt-3 pb-3 border border-green-900">
+                            <Pagination
+                                currentPage={fontSelectorPage}
+                                onPageChange={setFontSelectorPage}
+                                actualSize={pagedResult.actualSize}
+                                totalPageCount={pagedResult.totalPageCount}
+                                totalDataLength={pagedResult.totalDataLength}
+                            >
+                                {pagedResult.pagedList.map(x => (
+                                    <button
+                                        key={x.id}
+                                        className={cn("w-full box-border pl-2 pr-2 flex justify-between hover:bg-gray-100 hover:cursor-pointer",  font?.id === x.id && "bg-gray-200")}
+                                        onClick={() => setFont(x)}
+                                    >
+                                        <span>{x.label}</span>
+                                        <span className={x.className}>AaBbCc1234</span>
+                                    </button>
+                                ))}
+                            </Pagination>
+                        </div>
+                    </SideBarRow>
+
+                    <SideBarRow
+                        title={"Step 8. Add hashtags"}
+                        description={"*You can search your photos with the attatched hashtags"}
+                    >
+                        {/*TODO: 빈 영역 클릭시 input에 focus되게 코드 추가하기*/}
+                        <HashTagInput hashtags={hashTags} onChange={setHashTags} />
+                    </SideBarRow>
                 </aside>
             </div>
         )
     }
 
-    function SideBarRow ({children} : {children: ReactNode}) {
+    function SideBarRow ({title, description, className, children} : {title: string, description?: string, className?: string, children: ReactNode}) {
     return (
-        <div className={"font-bold pb-2 pt-4"}>{children}</div>
+        <div className={cn("w-full box-border pl-2 pr-2 mt-4", className)}>
+            <div className={"pb-2"}>
+                <div className="font-bold">{title}</div>
+                {description && (<div className="text-[#4a6248d4]">{description}</div>)}
+            </div>
+            {children}
+        </div>
+
         )
     }
 

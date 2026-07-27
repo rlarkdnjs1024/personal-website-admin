@@ -12,7 +12,7 @@ export function Button({onClick, className, children}: ButtonProps) {
         <button
             type="button"
             onClick={onClick}
-            className={cn("hover:cursor-pointer rounded-md box-border pr-1 pl-1 border border-green-900 bg-gray-200", className)}
+            className={cn("hover:cursor-pointer hover:bg-gray-100 rounded-md box-border pr-1 pl-1 border border-green-900 bg-[#FFFFFFB3]", className)}
         >
             {children}
         </button>

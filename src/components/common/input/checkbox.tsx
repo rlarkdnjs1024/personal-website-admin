@@ -1,16 +1,18 @@
 import {CheckBoxGroupContext} from "@/context/check-box-context";
 import {useContext} from "react";
+import {cn} from "@/lib/utils";
 
 type SingleCheckBoxProps = {
-    value: boolean
-    onValueChange: (value: boolean) => void
-    children: React.ReactNode
+    value: boolean,
+    onValueChange: (value: boolean) => void,
+    className?: string,
+    children: React.ReactNode,
 }
 
 
-export function SingleCheckBox({value, onValueChange, children}: SingleCheckBoxProps) {
+export function SingleCheckBox({value, onValueChange, className, children}: SingleCheckBoxProps) {
     return (
-        <label className="flex items-center hover:cursor-pointer">
+        <label className={cn("flex items-center hover:cursor-pointer", className)}>
             <input
                 type={"checkbox"}
                 checked={value}
