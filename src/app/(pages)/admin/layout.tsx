@@ -1,9 +1,9 @@
 import { courierPrime } from "@/fonts/fonts";
 import {APIProvider} from '@vis.gl/react-google-maps';
-import "../globals.css";
+import "../../globals.css";
 import {GoogleMapProvider} from "@/providers/GoogleMapProvider";
 
-export default function RootLayout({
+export default function AdminRootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
