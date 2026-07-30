@@ -1,5 +1,4 @@
 import { courierPrime } from "@/fonts/fonts";
-import {APIProvider} from '@vis.gl/react-google-maps';
 import "../../globals.css";
 import {GoogleMapProvider} from "@/providers/GoogleMapProvider";
 
