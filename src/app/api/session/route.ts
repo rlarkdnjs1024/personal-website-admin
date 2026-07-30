@@ -1,14 +1,11 @@
 import {NextRequest, NextResponse} from "next/server";
 import {z} from "zod";
-import {signIn} from "@/lib/auth";
+import {signIn, signOut} from "@/lib/auth";
+import {cookies} from "next/headers";
 
-const requestSchema = z.object({
-    email: z.email(),
-    password: z.string()
-})
 
+//session을 생성하는 로그인
 export async function POST(request: NextRequest) {
-
     let json;
     try {
         json = await request.json();
@@ -18,6 +15,11 @@ export async function POST(request: NextRequest) {
             {status: 400},
         );
     }
+
+    const requestSchema = z.object({
+        email: z.email(),
+        password: z.string()
+    })
 
     const parseResult = requestSchema.safeParse(json);
 
@@ -43,5 +45,38 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({message: error.message}, {status: error.code});
     }
 
-    return NextResponse.json({message: "Authorized"}, {status: 200});
+    return new NextResponse(null, {status: 204});
 }
+
+//session을 삭제하는 로그아웃
+export async function DELETE() {
+    const error = await signOut();
+
+    if (error) {
+        return NextResponse.json({message: error.message}, {status: error.code});
+    }
+
+    return new NextResponse(null, {status: 204});
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -26,14 +26,14 @@ export default function LoginForm({redirectTo}: Props) {
 
         try {
             const result = await fetch(
-                "/api/auth/login",
+                "/api/session",
                 {
                     method: "POST",
                     body: JSON.stringify({email: email, password: password, redirectTo: redirectTo})
                 }
             )
             if (result.ok) {
-                router.replace(redirectTo ?? "/");
+                window.location.href = redirectTo ?? "/"
             } else {
                 const {message} = await result.json();
                 window.alert(message);
