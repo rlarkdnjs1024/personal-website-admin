@@ -25,7 +25,6 @@ export default function LoginForm({redirectTo}: Props) {
         }
 
         try {
-            debugger
             const result = await fetch(
                 "/api/auth/login",
                 {
@@ -36,8 +35,8 @@ export default function LoginForm({redirectTo}: Props) {
             if (result.ok) {
                 router.replace(redirectTo ?? "/");
             } else {
-                const {error} = await result.json();
-                window.alert(error.message);
+                const {message} = await result.json();
+                window.alert(message);
             }
         } catch {
             window.alert("Network Error")

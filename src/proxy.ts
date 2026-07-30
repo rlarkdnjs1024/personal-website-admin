@@ -5,10 +5,10 @@ export function proxy(request: NextRequest) {
     const pathname = nextUrl.pathname;
 
     if (pathname.startsWith("/admin")) {
-        const token = request.cookies.get("token");
+        const sessionId = request.cookies.get("session_id");
 
         //토큰이 없으면 /login으로 리다이렉트 시킨다.
-        if (!token) {
+        if (!sessionId) {
             const loginUrl = nextUrl.clone();
             const redirectTo = pathname + nextUrl.search;
 
@@ -18,9 +18,20 @@ export function proxy(request: NextRequest) {
 
             return NextResponse.redirect(loginUrl);
         }
+        return NextResponse.next();
+    }
+
+    if (pathname.startsWith("/api/admin")) {
+        const sessionId = request.cookies.get("session_id");
+
+        if (!sessionId) {
+            return NextResponse.json({message: "Unauthorized. Please login"}, {status: 401})
+        }
+
+        return NextResponse.next();
     }
 }
 
 export const config = {
-    matcher: ["/admin/:path*"]
+    matcher: ["/admin/:path*", "/api/admin/:path*"]
 }

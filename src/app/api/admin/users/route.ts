@@ -33,6 +33,8 @@ const createUserSchema = z.object({
         .transform((value) => (value ? value : null)),
 });
 
+
+
 // 관리자가 직접 회원 테이블에 회원을 추가할 때 사용하는 API
 export async function POST(request: NextRequest) {
     // 1) 요청 body가 JSON으로 파싱 가능한지 확인.
@@ -73,7 +75,7 @@ export async function POST(request: NextRequest) {
         const hashedPassword = await hashPassword(password);
 
         const {error} = await supabase
-            .from("TB_USER")
+            .from("tb_user")
             .insert({
                 name: name,
                 email: email,
@@ -110,3 +112,5 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({message: "An internal server error occurred."}, {status: 500});
     }
 }
+
+
