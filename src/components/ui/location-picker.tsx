@@ -1,6 +1,6 @@
 import {useState} from "react";
 import {LatLngLiteral} from "@/types";
-import {Map, Marker} from '@/components/common/google-map'
+import {Map, Marker} from '@/components/ui/google-map'
 import {MapMouseEvent} from "@vis.gl/react-google-maps";
 
 type LocationPickerProps = {

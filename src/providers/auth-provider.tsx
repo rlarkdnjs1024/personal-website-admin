@@ -16,13 +16,7 @@ export type UserType = {
 
 const UserContext = createContext<UserType | null>(null);
 
-export function AuthProvider({
-                                 user,
-                                 children,
-                             }: {
-    user: UserType | null;
-    children: ReactNode;
-}) {
+export function AuthProvider({user, children,}: { user: UserType | null; children: ReactNode; }) {
     return (
         <UserContext.Provider value={user}>
             {children}

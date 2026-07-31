@@ -1,7 +1,7 @@
 import {NextRequest, NextResponse} from "next/server";
 import {supabase} from "@/lib/supabase.server"
 import {z} from "zod";
-import {hashPassword} from "@/lib/auth";
+import {getUser, hashPassword} from "@/lib/auth";
 
 const createUserSchema = z.object({
     name: z
@@ -37,6 +37,9 @@ const createUserSchema = z.object({
 
 // 관리자가 직접 회원 테이블에 회원을 추가할 때 사용하는 API
 export async function POST(request: NextRequest) {
+    //세션에서 role을 가져와 관리자인지 확인한다.
+    const user = await getUser()
+
     // 1) 요청 body가 JSON으로 파싱 가능한지 확인.
     //    request.json()은 body가 비어있거나 JSON이 아니면 예외를 던진다.
     let json;

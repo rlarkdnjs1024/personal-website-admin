@@ -137,6 +137,10 @@ export async function signOut(): Promise<SignInError|null> {
     }
 }
 
+export async function getSessionId() {
+    const cookieStore = await cookies();
+    return cookieStore.get("session_id")?.value;
+}
 
 export async function getUser(sessionId: string): Promise<UserType|null> {
     try {
@@ -160,17 +164,18 @@ export async function getUser(sessionId: string): Promise<UserType|null> {
             return null;
         }
 
-        const result = {
+        return {
             seq: user.seq,
             name: user.name,
             email: user.email,
             roleSeq: user.role_seq,
         };
-        // @ts-ignore
-        return result
 
     } catch (error) {
         throw error;
     }
+}
 
+export function isAdmin(roleSeq: number) {
+    return [1, 2].includes(roleSeq);
 }

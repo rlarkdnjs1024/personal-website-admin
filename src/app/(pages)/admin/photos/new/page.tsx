@@ -1,23 +1,23 @@
 "use client"
 import {ReactNode, useState} from "react";
-import {RadioGroup, RadioItem} from "@/components/common/input/radio";
-import {ImageSelector, ImageSelectorPolicy, UploadImage} from "@/components/common/image-selector";
-import {ColorPicker} from "@/components/pages/color-picker";
-import {TextInput} from "@/components/common/input/text-input";
-import {HashTagInput} from "@/components/common/input/hash-tag";
-import DatePicker from "@/components/common/input/date-input";
-import {SingleCheckBox} from "@/components/common/input/checkbox";
+import {RadioGroup, RadioItem} from "@/components/ui/radio";
+import {ImageSelector, ImageSelectorPolicy, UploadImage} from "@/components/ui/image-selector";
+import {ColorPicker} from "@/components/ui/color-picker";
+import {TextInput} from "@/components/ui/text-input";
+import {HashTagInput} from "@/components/ui/hash-tag";
+import DatePicker from "@/components/ui/date-input";
+import {SingleCheckBox} from "@/components/ui/checkbox";
 import {cn, paginateList} from "@/lib/utils";
 import {Font, FONTS} from "@/fonts/fonts";
-import {Pagination} from "@/components/common/pagination";
-import {Button} from "@/components/common/button";
+import {Pagination} from "@/components/ui/pagination";
+import {Button} from "@/components/ui/button";
 import {MapMouseEvent} from "@vis.gl/react-google-maps";
-import {Map} from '@/components/common/google-map'
+import {Map} from '@/components/ui/google-map'
 import {DefaultGeoLocation, LatLngLiteral} from "@/types";
-import {Marker} from "@/components/common/google-map";
+import {Marker} from "@/components/ui/google-map";
 import {useAddress} from "@/hooks/useAddress";
 
-type DisplayStyleType = "REC_POLAROID" | "SQR_POLAROID" | "PHOTO"
+type DisplayStyleType = "REC_POLAROID" | "SQR_POLAROID"
 
 export default function Home() {
 
@@ -110,11 +110,10 @@ export default function Home() {
                             name={"display-style"}
                             value={displayStyle}
                             onValueChange={setDisplayStyle}
-                            className="flex justify-between"
+                            className="flex gap-5"
                         >
                             <RadioItem itemValue={"REC_POLAROID"}>Rectangular polaroid</RadioItem>
                             <RadioItem itemValue={"SQR_POLAROID"}>Square polaroid</RadioItem>
-                            <RadioItem itemValue={"PHOTO"}>Photo</RadioItem>
                         </RadioGroup>
                     </SideBarRow>
 

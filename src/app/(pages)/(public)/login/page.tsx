@@ -1,6 +1,4 @@
-import {TextInput} from "@/components/common/input/text-input";
 import LoginForm from "@/components/pages/login-form";
-import {SearchParams} from "next/dist/server/request/search-params";
 
 export default async function LoginPage({searchParams,}: {
     searchParams: Promise<{

@@ -1,4 +1,4 @@
-import {TextInput} from "@/components/common/input/text-input";
+import {TextInput} from "@/components/ui/text-input";
 import {useState} from "react";
 
 

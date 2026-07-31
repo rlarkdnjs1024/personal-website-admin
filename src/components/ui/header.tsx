@@ -1,9 +1,11 @@
 "use client"
 
 import {useUser} from "@/providers/auth-provider";
+import {useRouter} from "next/navigation";
 
 export function Header() {
     const user = useUser();
+    const router = useRouter();
     const userName = user?.name;
 
     async function logout() {
@@ -20,12 +22,22 @@ export function Header() {
         }
     }
 
+    function handleLogin() {
+        router.push("/login");
+    }
+
     return (
-        <header className="bg-[#4a6248d4] text-white text-xl font-bold flex justify-between">
+        <>
             <div>
                 gawon's website
             </div>
-            {userName && (
+            {userName === undefined ? (
+                <div className="text-sm">
+                    <button className="underline" onClick={handleLogin}>
+                        login
+                    </button>
+                </div>
+            ): (
                 <div className="text-sm">
                     <span>
                         welcome! {" "}{userName}{" "}
@@ -35,6 +47,7 @@ export function Header() {
                     </button>
                 </div>
             )}
-        </header>
+        </>
+
     )
 }
