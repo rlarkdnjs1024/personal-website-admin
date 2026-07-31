@@ -1,7 +1,7 @@
 import {NextRequest, NextResponse} from "next/server";
 import {supabase} from "@/lib/supabase.server"
 import {z} from "zod";
-import {getUser, hashPassword} from "@/lib/auth";
+import {getSessionId, getUser, hashPassword, isAdmin} from "@/lib/auth";
 
 const createUserSchema = z.object({
     name: z
@@ -37,8 +37,23 @@ const createUserSchema = z.object({
 
 // 관리자가 직접 회원 테이블에 회원을 추가할 때 사용하는 API
 export async function POST(request: NextRequest) {
-    //세션에서 role을 가져와 관리자인지 확인한다.
-    const user = await getUser()
+    //세션에서 role을 가져와 관리자인지 확인한다. proxy에서 세션 아이디가 없는 경우는 리다이렉트 되기 때문에 sessionId가 있는 경우만 처리한다.
+    const sessionId = getSessionId(request)!;
+    const user = await getUser(sessionId);
+
+    if (!user) {
+        return NextResponse.json(
+            {message: "Unauthorized"},
+            {status: 401},
+        );
+    }
+
+    if (!isAdmin(user)) {
+        return NextResponse.json(
+            {message: "Forbidden"},
+            {status: 403},
+        );
+    }
 
     // 1) 요청 body가 JSON으로 파싱 가능한지 확인.
     //    request.json()은 body가 비어있거나 JSON이 아니면 예외를 던진다.

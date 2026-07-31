@@ -3,6 +3,7 @@ import {cookies} from "next/headers";
 import {supabase} from "@/lib/supabase.server";
 import {randomBytes, createHash} from "crypto";
 import {UserType} from "@/providers/auth-provider";
+import {NextRequest} from "next/server";
 
 export async function hashPassword(password: string) {
     return await argon2.hash(password);
@@ -137,9 +138,8 @@ export async function signOut(): Promise<SignInError|null> {
     }
 }
 
-export async function getSessionId() {
-    const cookieStore = await cookies();
-    return cookieStore.get("session_id")?.value;
+export function getSessionId(request: NextRequest) {
+    return request.cookies.get("sessionId")?.value;
 }
 
 export async function getUser(sessionId: string): Promise<UserType|null> {
@@ -176,6 +176,6 @@ export async function getUser(sessionId: string): Promise<UserType|null> {
     }
 }
 
-export function isAdmin(roleSeq: number) {
-    return [1, 2].includes(roleSeq);
+export function isAdmin(user: UserType) {
+    return [1, 2].includes(user.roleSeq);
 }
