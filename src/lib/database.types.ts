@@ -14,6 +14,68 @@ export type Database = {
   }
   public: {
     Tables: {
+      tb_photos: {
+        Row: {
+          city_name: string
+          country_code: string
+          country_name: string
+          created_at: string
+          file_size_bytes: number
+          height: number | null
+          latitude: number
+          longitude: number
+          mime_type: string
+          seq: number
+          status: string
+          storage_path: string
+          taken_at: string | null
+          uploaded_by: number
+          width: number | null
+        }
+        Insert: {
+          city_name: string
+          country_code: string
+          country_name: string
+          created_at?: string
+          file_size_bytes: number
+          height?: number | null
+          latitude: number
+          longitude: number
+          mime_type: string
+          seq?: number
+          status?: string
+          storage_path: string
+          taken_at?: string | null
+          uploaded_by: number
+          width?: number | null
+        }
+        Update: {
+          city_name?: string
+          country_code?: string
+          country_name?: string
+          created_at?: string
+          file_size_bytes?: number
+          height?: number | null
+          latitude?: number
+          longitude?: number
+          mime_type?: string
+          seq?: number
+          status?: string
+          storage_path?: string
+          taken_at?: string | null
+          uploaded_by?: number
+          width?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tb_photos_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "tb_user"
+            referencedColumns: ["seq"]
+          },
+        ]
+      }
       tb_role: {
         Row: {
           role_name: string

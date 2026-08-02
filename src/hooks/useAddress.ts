@@ -4,7 +4,7 @@ import {useEffect, useMemo, useState} from "react";
 import LatLngLiteral = google.maps.LatLngLiteral;
 import {useMapsLibrary} from "@vis.gl/react-google-maps";
 
-export function useAddress(location: LatLngLiteral) {
+export function useAddress(location: LatLngLiteral|null) {
     const [address, setAddress] = useState<string|null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const geocodingLib = useMapsLibrary("geocoding");
@@ -20,6 +20,7 @@ export function useAddress(location: LatLngLiteral) {
         let cancelled = false;
 
         async function loadAddress() {
+            if (!location) return;
             setIsLoading(true);
 
             try {
@@ -40,7 +41,6 @@ export function useAddress(location: LatLngLiteral) {
                 }
             }
         }
-
         loadAddress();
 
         return () => {

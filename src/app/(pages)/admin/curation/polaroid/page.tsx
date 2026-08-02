@@ -67,12 +67,12 @@ export default function Home() {
             return;
         }
 
-        const date = image.originalDate as Date;
+        // const date = image.takenAt as Date;
 
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, "0");
-        const day = String(date.getDate()).padStart(2, "0");
-        setDate(`${year}-${month}-${day}`);
+        // const year = date.getFullYear();
+        // const month = String(date.getMonth() + 1).padStart(2, "0");
+        // const day = String(date.getDate()).padStart(2, "0");
+        // setDate(`${year}-${month}-${day}`);
     }
 
 
@@ -123,7 +123,7 @@ export default function Home() {
                             <SingleCheckBox value={useAutoConvert} onValueChange={setUseAutoConvert}>Auto convert .heic to.jpg</SingleCheckBox>
                             <SingleCheckBox value={useAutoAdjust} onValueChange={setUseAutoAdjust}>Adjust image size and dimension</SingleCheckBox>
                         </div>
-                        <ImageSelector name={"image"} file={image} onFileChange={handleImageChange} policy={policy} />
+                        {/*<ImageSelector name={"image"} file={image} onFileChange={handleImageChange} policy={policy} />*/}
                     </SideBarRow>
 
                     <SideBarRow
@@ -173,7 +173,7 @@ export default function Home() {
                     >
                         <div className={"flex justify-between"}>
                             <DatePicker value={date} onValueChange={setDate}/>
-                            {image?.originalDate && (<Button onClick={() => handleUseExifButtonClick()}>use exif data</Button>)}
+                            {image?.takenAt && (<Button onClick={() => handleUseExifButtonClick()}>use exif data</Button>)}
                         </div>
 
                     </SideBarRow>

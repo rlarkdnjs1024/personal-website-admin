@@ -4,16 +4,17 @@ import {
     validateImageDimension,
     validateSize
 } from "@/lib/utils";
-import {useRef, useState} from "react";
+import React, {useRef, useState} from "react";
 import imageCompression from "browser-image-compression";
 import * as exif from "exifr"
 import {LatLngLiteral} from "@/types";
 import {convertHeicToJpg, getImageType} from "@/lib/file";
+import {useAddress} from "@/hooks/useAddress";
+import DatePicker from "@/components/ui/date-input";
+
 
 type ImageSelectorProps = {
     name: string;
-    file: SelectedImage | null,
-    onFileChange: (file: SelectedImage | null) => void,
     policy: ImageSelectorPolicy,
 }
 
@@ -23,8 +24,15 @@ export type SelectedImage = {
     originalName: string,
     uploadSize: number,
     uploadDimension: ImageDimension,
+
+    //EXIF 데이터를 가져오지만 없을 수도 있다.
     originalLocation?: LatLngLiteral,
-    originalDate?: Date,
+    takenAt?: string,
+
+    //지도에서 나라와 도시로 marker clustering을 하기 위해 필요한 값들.
+    countryName?: string,
+    cityName?: string,
+
     previewUrl: string,
 }
 
@@ -48,17 +56,6 @@ export type ImageSelectorPolicy = {
 /** browser-image-compression은 용량 옵션을 MB 단위로 받기 때문에 byte ↔ MB 환산에 사용한다. */
 const BYTES_PER_MB = 1024 * 1024;
 
-/**
- * 파일의 실제 픽셀 크기를 알아낸다.
- * `polaroid Image()` + onload 방식보다 가벼운 디코딩 전용 API(createImageBitmap)를 사용하며,
- * 미리보기를 만들 목적이 아니라 "자동 보정이 필요한가?"를 판단하기 위한 사전 체크용이다.
- */
-async function getDimension(file: File): Promise<ImageDimension> {
-    const bitmap = await createImageBitmap(file);
-    const dimension = {width: bitmap.width, height: bitmap.height};
-    bitmap.close();
-    return dimension;
-}
 
 /**
  * 파일을 실제로 디코딩해서 미리보기용 objectURL과 "진짜" dimension을 얻는다.
@@ -86,9 +83,19 @@ function decodeImage(file: File): Promise<{ url: string, dimension: ImageDimensi
     });
 }
 
-export function ImageSelector({name, file, onFileChange, policy}: ImageSelectorProps) {
+function formatDate(date: Date) {
+    console.log(date.toISOString());
+    const fullYear = date.getUTCFullYear();
+    const month = date.getUTCMonth() + 1;
+    const day = date.getUTCDate();
+    return `${fullYear}-${month}-${day}`;
+}
 
+export function ImageSelector({name, policy}: ImageSelectorProps) {
+
+    const [file, setFile] = useState<SelectedImage|null>(null);
     const inputRef = useRef<HTMLInputElement | null>(null);
+    const {address, isLoading: isAddressLoading} = useAddress(file?.originalLocation ?? null);
 
     // 변환/압축/디코딩이 진행되는 동안 중복 선택을 막고 상태를 보여주기 위한 플래그
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -112,7 +119,7 @@ export function ImageSelector({name, file, onFileChange, policy}: ImageSelectorP
     function handleDeleteButton() {
         if (file) {
             URL.revokeObjectURL(file.previewUrl);
-            onFileChange(null);
+            setFile(null);
         }
     }
 
@@ -134,11 +141,11 @@ export function ImageSelector({name, file, onFileChange, policy}: ImageSelectorP
 
                 if (exifData?.latitude !== undefined && exifData?.longitude !== undefined) {
                     originalLocation = {
-                        lat: exifData.latitude,
-                        lng: exifData.longitude,
+                        lat: exifData.latitude as number,
+                        lng: exifData.longitude as number,
                     }
                 }
-                originalDate = exifData?.DateTimeOriginal;
+                originalDate = exifData?.DateTimeOriginal as Date;
             } catch (e) {
                 console.error("Failed to parse exif");
                 console.error(e);
@@ -209,11 +216,11 @@ export function ImageSelector({name, file, onFileChange, policy}: ImageSelectorP
                 URL.revokeObjectURL(file.previewUrl);
             }
 
-            onFileChange({
+            setFile({
                 uploadFile: adjustedWebp,
                 originalName: inputFile.name,
                 originalLocation: originalLocation,
-                originalDate: originalDate,
+                takenAt: originalDate && formatDate(originalDate),
                 uploadSize: adjustedWebp.size,
                 uploadDimension: finalDimension,
                 previewUrl,
@@ -225,7 +232,7 @@ export function ImageSelector({name, file, onFileChange, policy}: ImageSelectorP
     }
 
     // 세 가지 상태(로딩 중 / 빈 상태 / 파일 선택됨)가 공유하는 바깥 박스 스타일
-    const boxBaseClass = "bg-gray-200 w-full h-20 box-border p-2 border border-green-900 border-dashed m-auto rounded-xl";
+    const boxBaseClass = "bg-gray-200 w-full h-50 box-border p-2 border border-green-900 border-dashed m-auto rounded-xl";
 
     function renderBox() {
         if (isLoading) {
@@ -263,9 +270,51 @@ export function ImageSelector({name, file, onFileChange, policy}: ImageSelectorP
                         x
                     </button>
                 </div>
-                <div className="flex flex-col items-center justify-center">
-                    <div>{file.originalName}</div>
-                    <div>{file.uploadDimension.width} x {file.uploadDimension.height} ({formatBytes(file.uploadSize)})</div>
+
+
+                <div className="w-[50%]">
+                    <div>
+                        <div className={"font-bold"}>Where was the photo taken?</div>
+                        <div>{address ?? "No EXIF location found. Click to add yourself"}</div>
+                    </div>
+                    <div>
+                        <div className={"font-bold"}>When was the photo taken?</div>
+                        <div>
+                            <DatePicker value={file.takenAt ?? ""} onValueChange={(value) => setFile({...file, takenAt: value})}/>
+                        </div>
+                    </div>
+                    <div className="border-b-gray-300 border-b-1 focus-within:border-b-[#4a6248d4]">
+                        <div className={"font-bold"}>Country Name</div>
+                        <input
+                            type="text"
+                            name="country-name"
+                            value={file.countryName ?? ""}
+                            maxLength={30}
+                            onChange={(e) => setFile({...file, countryName: e.target.value})}
+                            className="w-[90%] focus:outline-none mb-1"
+                        />
+                    </div>
+                    <div className="border-b-gray-300 border-b-1 focus-within:border-b-[#4a6248d4]">
+                        <div className={"font-bold"}>City Name</div>
+                        <input
+                            type="text"
+                            name="city-name"
+                            value={file.cityName ?? ""}
+                            maxLength={30}
+                            onChange={(e) => setFile({...file, cityName: e.target.value})}
+                            className="w-[90%] focus:outline-none mb-1"
+                        />
+                    </div>
+                </div>
+
+                <div className="flex flex-col justify-end">
+                    <div className="w-full text-center">
+                        <button
+                            type="button"
+                            className="bg-[#4a6248d4] p-2 rounded-md shadow hover:cursor-pointer text-white"
+                        >Add Image
+                        </button>
+                    </div>
                 </div>
             </div>
         );

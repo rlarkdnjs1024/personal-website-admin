@@ -10,30 +10,13 @@ type TextInputProps = {
     minLength?: number,
     maxLength?: number,
     placeholder?: string,
-    errorMessage?: string,
 
     className?: string,
 }
 
-export function TextInput({name, value, onValueChange, onKeyDown, minLength, maxLength, placeholder, errorMessage, className}: TextInputProps) {
-
-    function getDisplayErrorMessage() {
-        if (errorMessage) {
-            return errorMessage;
-        } else if (minLength && value.length < minLength) {
-            return `(!) Should be at least ${minLength} characters.`;
-        } else if (maxLength && value.length > maxLength) {
-            return `(!) Should be less than ${maxLength} characters.`;
-        }
-        else {
-            return "";
-        }
-    }
-
-    const displayErrorMessage = getDisplayErrorMessage();
+export function TextInput({name, value, onValueChange, onKeyDown, minLength, maxLength, placeholder, className}: TextInputProps) {
 
     return (
-        <>
             <input
                 name={name}
                 type="text"
@@ -44,10 +27,5 @@ export function TextInput({name, value, onValueChange, onKeyDown, minLength, max
                 maxLength={maxLength}
                 className={cn("border rounded-lg box-border pl-1 pr-1 border-green-800 bg-transparent text-foreground outline-none w-full", className)}
             />
-            <p className={cn("text-red-600 inline", displayErrorMessage ? "visible" : "invisible")}>
-                {displayErrorMessage || "\u00A0"}
-            </p>
-        </>
-
     )
 }
