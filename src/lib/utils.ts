@@ -108,17 +108,6 @@ export function extractFileName (originalName: string) {
     return lastIndex > -1 ? originalName.slice(0, lastIndex) : originalName;
 }
 
-export async function convertHeicToJpeg (file: File) {
-    const isFileHeic = await isHeic(file);
 
-    //isHeic()은 파일의 확장자나 MIME 타입을 넘어 파일 내용을 확인하여 heic인지 검사한다.
-    if (!isFileHeic) {
-        return file;
-    }
-    const heic = await heicTo({blob: file, type: "image/jpeg", quality: 0.85});
-    const newName = file.name.replace(/\.[^.]+$/, ".jpg");
-
-    return new File([heic], newName, {type: "image/jpeg"});
-}
 
 

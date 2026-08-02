@@ -1,9 +1,9 @@
 "use client"
-import {ImageSelector, ImageSelectorPolicy, UploadImage} from "@/components/ui/image-selector";
+import {ImageSelector, ImageSelectorPolicy, SelectedImage} from "@/components/ui/image-selector";
 import {useState} from "react";
 
 export function NewPhotoPage() {
-    const [image, setImage] = useState<UploadImage|null>(null);
+    const [image, setImage] = useState<SelectedImage|null>(null);
 
     const policy: ImageSelectorPolicy  = {
         maximumBytes: 500 * 1024,

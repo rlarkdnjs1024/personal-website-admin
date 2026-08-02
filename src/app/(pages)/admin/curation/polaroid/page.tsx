@@ -1,7 +1,7 @@
 "use client"
 import {ReactNode, useState} from "react";
 import {RadioGroup, RadioItem} from "@/components/ui/radio";
-import {ImageSelector, ImageSelectorPolicy, UploadImage} from "@/components/ui/image-selector";
+import {ImageSelector, ImageSelectorPolicy, SelectedImage} from "@/components/ui/image-selector";
 import {ColorPicker} from "@/components/ui/color-picker";
 import {TextInput} from "@/components/ui/text-input";
 import {HashTagInput} from "@/components/ui/hash-tag";
@@ -22,7 +22,7 @@ type DisplayStyleType = "REC_POLAROID" | "SQR_POLAROID"
 export default function Home() {
 
     const [displayStyle, setDisplayStyle] = useState<string>("REC_POLAROID");
-    const [image, setImage] = useState<UploadImage|null>(null);
+    const [image, setImage] = useState<SelectedImage|null>(null);
     const [color, setColor] = useState<string>("#A6A59C1F");
     const [comment, setComment] = useState<string>("");
     const [hashTags, setHashTags] = useState<string[]>([]);
@@ -45,7 +45,7 @@ export default function Home() {
     const PAGE_SIZE = 10;
     const pagedResult = paginateList({sourceList: FONTS, pageSize: PAGE_SIZE, page: fontSelectorPage});
 
-    function handleImageChange(image: UploadImage|null) {
+    function handleImageChange(image: SelectedImage|null) {
         setImage(image);
 
         if (image !== null && image.originalLocation !== undefined) {

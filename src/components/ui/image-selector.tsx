@@ -1,34 +1,28 @@
 import {
     cn,
-    convertHeicToJpeg,
     formatBytes,
-    validateFileType,
     validateImageDimension,
     validateSize
 } from "@/lib/utils";
 import {useRef, useState} from "react";
-import {isHeic} from "heic-to";
 import imageCompression from "browser-image-compression";
 import * as exif from "exifr"
 import {LatLngLiteral} from "@/types";
+import {convertHeicToJpg, getImageType} from "@/lib/file";
 
 type ImageSelectorProps = {
     name: string;
-    file: UploadImage | null,
-    onFileChange: (file: UploadImage | null) => void,
+    file: SelectedImage | null,
+    onFileChange: (file: SelectedImage | null) => void,
     policy: ImageSelectorPolicy,
 }
 
 /** 업로드가 확정된 이미지 상태. 실제 전송에 쓰이는 File과 화면 표시용 메타데이터를 함께 담는다. */
-export type UploadImage = {
-    originalFile: File,
+export type SelectedImage = {
     uploadFile: File,
-
     originalName: string,
-    uploadName: string,
     uploadSize: number,
     uploadDimension: ImageDimension,
-
     originalLocation?: LatLngLiteral,
     originalDate?: Date,
     previewUrl: string,
@@ -99,9 +93,6 @@ export function ImageSelector({name, file, onFileChange, policy}: ImageSelectorP
     // 변환/압축/디코딩이 진행되는 동안 중복 선택을 막고 상태를 보여주기 위한 플래그
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
-    const AUTO_CONVERT = policy.useAutoConvert ?? false;
-    const AUTO_ADJUST = policy.useAutoAdjust ?? false;
-
     const MAXIMUM_BYTES = policy.maximumBytes;
     const MAXIMUM_WIDTH_OR_HEIGHT = policy.maximumWidthOrHeight;
 
@@ -112,12 +103,7 @@ export function ImageSelector({name, file, onFileChange, policy}: ImageSelectorP
     };
 
     // <input accept="">는 MIME과 확장자를 함께 넣어야 브라우저별 파일 선택창 필터링이 안정적으로 동작한다.
-    // heic는 useAutoConvert가 켜져 있을 때만 선택 가능한 옵션으로 노출한다.
-    const ALLOWED_TYPES = [
-        "image/jpeg", ".jpg", ".jpeg",
-        "image/png", ".png",
-        ...(AUTO_CONVERT ? ["image/heic", ".heic"] : []),
-    ];
+    const ALLOWED_TYPES = ["image/jpeg", ".jpg", ".jpeg", "image/heic", ".heic"];
 
     function handleClick() {
         inputRef.current?.click();
@@ -141,7 +127,6 @@ export function ImageSelector({name, file, onFileChange, policy}: ImageSelectorP
         setIsLoading(true);
 
         try {
-
             //0. 변환 과정 전에 필요한 EXIF 정보들을 파싱한다.
             let originalLocation, originalDate;
             try {
@@ -159,82 +144,52 @@ export function ImageSelector({name, file, onFileChange, policy}: ImageSelectorP
                 console.error(e);
             }
 
-            // 1. heic 여부 판단 후 필요하면 jpeg로 변환한다.
-            //    MIME 타입/확장자는 브라우저마다 heic를 다르게 표기해서 신뢰할 수 없으므로,
-            //    isHeic()으로 실제 파일 내용을 직접 검사해서 판단한다.
-            let convertedFile = inputFile;
-            const isFileHeic = await isHeic(inputFile);
 
-            if (isFileHeic && AUTO_CONVERT) {
-                try {
-                    convertedFile = await convertHeicToJpeg(inputFile);
-                } catch (e) {
-                    window.alert("Failed to convert image.");
-                    console.error(e);
-                    return;
-                }
-            }
+            //.heic, .jpg 이미지를 webp로 변환한다.
+            const fileType = await getImageType(inputFile);
+            const mimeType = fileType?.mime
 
-            // 2. 변환 이후에도 jpeg/png가 아니면 거부한다.
-            //    (heic 자동 변환이 꺼져 있는데 heic가 들어온 경우, 혹은 애초에 지원하지 않는 포맷인 경우)
-            if (!validateFileType(convertedFile.type, ["image/jpeg", "image/png"])) {
-                window.alert("File type is not supported.");
+            //파일이 손상되어 type을 가져올 수 없는 경우
+            if (!mimeType) {
+                window.alert("Invalid file type.");
                 return;
             }
 
-            // 3. 자동 보정(압축)이 필요한지 판단하기 위해 실제 dimension을 먼저 확인한다.
-            //    파일 용량(byte)은 File.size로 바로 알 수 있지만, dimension은 디코딩을 거쳐야만 알 수 있다.
-            let originalDimension: ImageDimension;
+            let jpg = inputFile;
+
+            //heic은 jpeg로 먼저 변환한다.
+            if (mimeType === "image/heic") {
+                jpg = await convertHeicToJpg(inputFile);
+            }
+
+            //jpg를 webp로 변환하며 policy에 맞게 resizing 및 compressing을 진행한다.
+            let adjustedWebp;
             try {
-                originalDimension = await getDimension(convertedFile);
+                adjustedWebp = await imageCompression(jpg, {
+                    fileType: "image/webp",
+                    maxSizeMB: MAXIMUM_BYTES / BYTES_PER_MB,
+                    maxWidthOrHeight: MAXIMUM_WIDTH_OR_HEIGHT,
+                    useWebWorker: true,
+                });
             } catch (e) {
-                window.alert("Failed to load image.");
+                window.alert("Failed to compress image.");
                 console.error(e);
                 return;
             }
 
-            const isSizeExceeded = !validateSize(convertedFile.size, MAXIMUM_BYTES);
-            const isDimensionExceeded = !validateImageDimension(originalDimension, MAXIMUM_DIMENSION);
-
-            let adjustedFile = convertedFile;
-            let wasAdjusted = false;
-
-            // 4. size 또는 dimension이 한도를 넘으면, 자동 보정이 켜져 있을 때만 압축을 시도한다.
-            //    꺼져 있으면 사용자가 직접 더 작은 이미지를 골라야 한다.
-            if (isSizeExceeded || isDimensionExceeded) {
-                if (!AUTO_ADJUST) {
-                    window.alert(isSizeExceeded ? "Your file size is too large." : "Your image exceeds the dimension limit.");
-                    return;
-                }
-
-                try {
-                    adjustedFile = await imageCompression(convertedFile, {
-                        maxSizeMB: MAXIMUM_BYTES / BYTES_PER_MB,
-                        maxWidthOrHeight: MAXIMUM_WIDTH_OR_HEIGHT,
-                        useWebWorker: true,
-                    });
-                } catch (e) {
-                    window.alert("Failed to auto compress image.");
-                    console.error(e);
-                    return;
-                }
-
-                wasAdjusted = true;
-
-                // imageCompression()은 목표 용량을 100% 보장하지 않는 best-effort API이므로,
-                // 압축 결과를 다시 검증해야 한다. (dimension은 5번 단계의 실제 디코딩으로 재검증)
-                if (!validateSize(adjustedFile.size, MAXIMUM_BYTES)) {
-                    window.alert("Compression couldn't reduce the file size enough. Please choose a smaller image.");
-                    return;
-                }
+            // imageCompression()은 목표 용량을 100% 보장하지 않는 best-effort API이므로,
+            // 압축 결과를 다시 검증해야 한다. (dimension은 5번 단계의 실제 디코딩으로 재검증)
+            if (!validateSize(adjustedWebp.size, MAXIMUM_BYTES)) {
+                window.alert("Compression couldn't reduce the file size enough. Please choose a smaller image.");
+                return;
             }
 
-            // 5. 최종 파일을 실제로 디코딩해서 미리보기 URL과 "진짜" dimension을 얻는다.
-            //    압축이 일어났다면 픽셀이 바뀌었으므로, 3번 단계의 dimension을 재사용하지 않고 다시 확인한다.
+
+            //    최종 파일을 실제로 디코딩해서 미리보기 URL과 "진짜" dimension을 얻는다.
             let previewUrl: string;
             let finalDimension: ImageDimension;
             try {
-                const decoded = await decodeImage(adjustedFile);
+                const decoded = await decodeImage(adjustedWebp);
                 previewUrl = decoded.url;
                 finalDimension = decoded.dimension;
             } catch (e) {
@@ -245,11 +200,7 @@ export function ImageSelector({name, file, onFileChange, policy}: ImageSelectorP
 
             if (!validateImageDimension(finalDimension, MAXIMUM_DIMENSION)) {
                 URL.revokeObjectURL(previewUrl);
-                window.alert(
-                    wasAdjusted
-                        ? "Compression couldn't reduce the dimension enough. Please choose a smaller image."
-                        : "Your image exceeds the dimension limit."
-                );
+                window.alert("Compression couldn't reduce the dimension enough. Please choose a smaller image.");
                 return;
             }
 
@@ -259,13 +210,11 @@ export function ImageSelector({name, file, onFileChange, policy}: ImageSelectorP
             }
 
             onFileChange({
-                originalFile: inputFile,
-                uploadFile: adjustedFile,
+                uploadFile: adjustedWebp,
                 originalName: inputFile.name,
                 originalLocation: originalLocation,
                 originalDate: originalDate,
-                uploadName: adjustedFile.name,
-                uploadSize: adjustedFile.size,
+                uploadSize: adjustedWebp.size,
                 uploadDimension: finalDimension,
                 previewUrl,
             });
@@ -295,11 +244,6 @@ export function ImageSelector({name, file, onFileChange, policy}: ImageSelectorP
                             <span>Click</span>
                         </button>
                         {" "}to add image
-                    </div>
-                    <div className="text-sm text-gray-500 flex flex-col items-center justify-center">
-                        <div>
-                            {!AUTO_ADJUST && `${formatBytes(MAXIMUM_BYTES)}, ${MAXIMUM_WIDTH_OR_HEIGHT}x${MAXIMUM_WIDTH_OR_HEIGHT} px`}
-                        </div>
                     </div>
                 </div>
             );
