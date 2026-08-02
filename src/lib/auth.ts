@@ -139,7 +139,7 @@ export async function signOut(): Promise<SignInError|null> {
 }
 
 export function getSessionId(request: NextRequest) {
-    return request.cookies.get("sessionId")?.value;
+    return request.cookies.get("session_id")?.value;
 }
 
 export async function getUser(sessionId: string): Promise<UserType|null> {

@@ -1,6 +1,5 @@
 "use client"
 import React, {useState} from "react";
-import {useRouter} from "next/navigation";
 
 type Props = {
     redirectTo?: string;
@@ -34,7 +33,8 @@ export default function LoginForm({redirectTo}: Props) {
                 }
             )
             if (result.ok) {
-                window.location.href = redirectTo ?? "/"
+                console.log(redirectTo);
+                window.location.replace("/admin");
             } else {
                 const {message} = await result.json();
                 window.alert(message);

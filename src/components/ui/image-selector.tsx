@@ -56,7 +56,7 @@ const BYTES_PER_MB = 1024 * 1024;
 
 /**
  * 파일의 실제 픽셀 크기를 알아낸다.
- * `new Image()` + onload 방식보다 가벼운 디코딩 전용 API(createImageBitmap)를 사용하며,
+ * `polaroid Image()` + onload 방식보다 가벼운 디코딩 전용 API(createImageBitmap)를 사용하며,
  * 미리보기를 만들 목적이 아니라 "자동 보정이 필요한가?"를 판단하기 위한 사전 체크용이다.
  */
 async function getDimension(file: File): Promise<ImageDimension> {
