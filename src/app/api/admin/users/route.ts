@@ -1,5 +1,5 @@
 import {NextRequest, NextResponse} from "next/server";
-import {supabase} from "@/lib/supabase.server"
+import {supabaseServerClient} from "@/lib/supabase.server"
 import {z} from "zod";
 import {getSessionId, getUser, hashPassword, isAdmin} from "@/lib/auth";
 
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
     try {
         const hashedPassword = await hashPassword(password);
 
-        const {error} = await supabase
+        const {error} = await supabaseServerClient
             .from("tb_user")
             .insert({
                 name: name,

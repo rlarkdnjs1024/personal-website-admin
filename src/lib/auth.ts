@@ -1,6 +1,6 @@
 import argon2 from "argon2";
 import {cookies} from "next/headers";
-import {supabase} from "@/lib/supabase.server";
+import {supabaseServerClient} from "@/lib/supabase.server";
 import {randomBytes, createHash} from "crypto";
 import {UserType} from "@/providers/auth-provider";
 import {NextRequest} from "next/server";
@@ -28,7 +28,7 @@ type SignInError = {
 
 export async function signIn({email, password}: {email: string, password: string}): Promise<SignInError|null> {
     try {
-        const {data: user, error: selectUserError} = await supabase.from("tb_user")
+        const {data: user, error: selectUserError} = await supabaseServerClient.from("tb_user")
             .select("seq, password")
             .eq("email", email)
             .eq("deleted_yn", false)
@@ -67,7 +67,7 @@ export async function signIn({email, password}: {email: string, password: string
         //세션의 유효기간은 24시간이다.
         const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-        const { error: insertSessionError } = await supabase.from("tb_session")
+        const { error: insertSessionError } = await supabaseServerClient.from("tb_session")
             .insert({
                 session_id_hashed: hashedSessionId,
                 user_seq: user.seq,
@@ -113,7 +113,7 @@ export async function signOut(): Promise<SignInError|null> {
         }
 
         const hashedSessionId = hashSessionId(sessionId);
-        const {error: deleteSessionError} = await supabase
+        const {error: deleteSessionError} = await supabaseServerClient
             .from("tb_session")
             .delete()
             .eq("session_id_hashed", hashedSessionId);
@@ -146,7 +146,7 @@ export async function getUser(sessionId: string): Promise<UserType|null> {
     try {
         const hashedSessionId = hashSessionId(sessionId);
 
-        const {data, error} = await supabase
+        const {data, error} = await supabaseServerClient
             .from("tb_session")
             .select("tb_user!inner(seq, name, email, role_seq)")
             .eq("session_id_hashed", hashedSessionId)

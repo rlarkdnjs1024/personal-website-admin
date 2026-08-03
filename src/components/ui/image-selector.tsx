@@ -15,6 +15,8 @@ import DatePicker from "@/components/ui/date-input";
 
 type ImageSelectorProps = {
     name: string;
+    file: SelectedImage|null,
+    onFileChange: (file: SelectedImage|null) => void,
     policy: ImageSelectorPolicy,
 }
 
@@ -24,6 +26,7 @@ export type SelectedImage = {
     originalName: string,
     uploadSize: number,
     uploadDimension: ImageDimension,
+    uploadMimeType: string,
 
     //EXIF 데이터를 가져오지만 없을 수도 있다.
     originalLocation?: LatLngLiteral,
@@ -91,11 +94,9 @@ function formatDate(date: Date) {
     return `${fullYear}-${month}-${day}`;
 }
 
-export function ImageSelector({name, policy}: ImageSelectorProps) {
+export function ImageSelector({name, file, onFileChange, policy}: ImageSelectorProps) {
 
-    const [file, setFile] = useState<SelectedImage|null>(null);
     const inputRef = useRef<HTMLInputElement | null>(null);
-    const {address, isLoading: isAddressLoading} = useAddress(file?.originalLocation ?? null);
 
     // 변환/압축/디코딩이 진행되는 동안 중복 선택을 막고 상태를 보여주기 위한 플래그
     const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -119,7 +120,7 @@ export function ImageSelector({name, policy}: ImageSelectorProps) {
     function handleDeleteButton() {
         if (file) {
             URL.revokeObjectURL(file.previewUrl);
-            setFile(null);
+            onFileChange(null);
         }
     }
 
@@ -216,8 +217,9 @@ export function ImageSelector({name, policy}: ImageSelectorProps) {
                 URL.revokeObjectURL(file.previewUrl);
             }
 
-            setFile({
+            onFileChange({
                 uploadFile: adjustedWebp,
+                uploadMimeType: adjustedWebp.type,
                 originalName: inputFile.name,
                 originalLocation: originalLocation,
                 takenAt: originalDate && formatDate(originalDate),
@@ -246,11 +248,11 @@ export function ImageSelector({name, policy}: ImageSelectorProps) {
         if (file === null) {
             return (
                 <div className={cn(boxBaseClass, "flex flex-col items-center justify-center")}>
-                    <div>
+                    <div className={"text-center"}>
                         <button className="text-green-900 underline hover:cursor-pointer" onClick={handleClick}>
                             <span>Click</span>
                         </button>
-                        {" "}to add image
+                        <span>{" "}to add image. <br/> Your image may be converted, compressed, and resized</span>
                     </div>
                 </div>
             );
@@ -272,50 +274,15 @@ export function ImageSelector({name, policy}: ImageSelectorProps) {
                 </div>
 
 
-                <div className="w-[50%]">
+                <div className={"flex flex-col justify-center items-center"}>
                     <div>
-                        <div className={"font-bold"}>Where was the photo taken?</div>
-                        <div>{address ?? "No EXIF location found. Click to add yourself"}</div>
+                        {file.originalName}
                     </div>
                     <div>
-                        <div className={"font-bold"}>When was the photo taken?</div>
-                        <div>
-                            <DatePicker value={file.takenAt ?? ""} onValueChange={(value) => setFile({...file, takenAt: value})}/>
-                        </div>
-                    </div>
-                    <div className="border-b-gray-300 border-b-1 focus-within:border-b-[#4a6248d4]">
-                        <div className={"font-bold"}>Country Name</div>
-                        <input
-                            type="text"
-                            name="country-name"
-                            value={file.countryName ?? ""}
-                            maxLength={30}
-                            onChange={(e) => setFile({...file, countryName: e.target.value})}
-                            className="w-[90%] focus:outline-none mb-1"
-                        />
-                    </div>
-                    <div className="border-b-gray-300 border-b-1 focus-within:border-b-[#4a6248d4]">
-                        <div className={"font-bold"}>City Name</div>
-                        <input
-                            type="text"
-                            name="city-name"
-                            value={file.cityName ?? ""}
-                            maxLength={30}
-                            onChange={(e) => setFile({...file, cityName: e.target.value})}
-                            className="w-[90%] focus:outline-none mb-1"
-                        />
+                        {formatBytes(file.uploadSize)} {file.uploadDimension.width}x{file.uploadDimension.height}
                     </div>
                 </div>
 
-                <div className="flex flex-col justify-end">
-                    <div className="w-full text-center">
-                        <button
-                            type="button"
-                            className="bg-[#4a6248d4] p-2 rounded-md shadow hover:cursor-pointer text-white"
-                        >Add Image
-                        </button>
-                    </div>
-                </div>
             </div>
         );
     }
