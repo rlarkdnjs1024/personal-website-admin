@@ -9,8 +9,7 @@ import imageCompression from "browser-image-compression";
 import * as exif from "exifr"
 import {LatLngLiteral} from "@/types";
 import {convertHeicToJpg, getImageType} from "@/lib/file";
-import {useAddress} from "@/hooks/useAddress";
-import DatePicker from "@/components/ui/date-input";
+
 
 
 type ImageSelectorProps = {
@@ -50,8 +49,6 @@ type ImageDimension = {
  * - useAutoAdjust: size/dimension이 한도를 넘었을 때 자동 압축·리사이즈를 시도할지 여부. false면 즉시 거부된다.
  */
 export type ImageSelectorPolicy = {
-    useAutoConvert?: boolean,
-    useAutoAdjust?: boolean,
     maximumBytes: number,
     maximumWidthOrHeight: number,
 }
@@ -86,12 +83,12 @@ function decodeImage(file: File): Promise<{ url: string, dimension: ImageDimensi
     });
 }
 
-function formatDate(date: Date) {
-    console.log(date.toISOString());
-    const fullYear = date.getUTCFullYear();
-    const month = date.getUTCMonth() + 1;
-    const day = date.getUTCDate();
-    return `${fullYear}-${month}-${day}`;
+function formatDate(date: Date): string {
+    const year = date.getUTCFullYear();
+    const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+    const day = String(date.getUTCDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
 }
 
 export function ImageSelector({name, file, onFileChange, policy}: ImageSelectorProps) {

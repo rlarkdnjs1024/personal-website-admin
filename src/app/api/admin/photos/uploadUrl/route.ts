@@ -30,6 +30,8 @@ export async function GET(request: NextRequest) {
         }
 
         return NextResponse.json({
+            path: data.path,
+            token: data.token,
             signedUrl: data.signedUrl,
         }, {
             status: 200

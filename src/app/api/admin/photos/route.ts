@@ -1,22 +1,8 @@
 import {getSessionId, getUser, isAdmin} from "@/lib/auth";
 import {NextRequest, NextResponse} from "next/server";
 import {z} from "zod";
-import {LatLngLiteral} from "@/types";
-import {supabaseBrowserClient} from "@/lib/supabase.browser";
 import {supabaseServerClient} from "@/lib/supabase.server";
-
-const postPhotoSchema = z.object({
-    storagePath: z.url().max(500),
-    mimeType: z.string().max(100),
-    fileSizeBytes: z.number().int().positive(),
-    width: z.number().int().positive(),
-    height: z.number().int().positive(),
-    takenAt: z.iso.date(),
-    countryName: z.string().max(50),
-    cityName: z.string().max(50),
-    latitude: z.number().min(-90).max(90),
-    longitude: z.number().min(-180).max(180),
-})
+import {postPhotoSchema} from "@/schemas/photo";
 
 export async function POST(request: NextRequest) {
     const sessionId = getSessionId(request)!;

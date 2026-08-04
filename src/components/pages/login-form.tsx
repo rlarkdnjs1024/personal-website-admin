@@ -33,8 +33,7 @@ export default function LoginForm({redirectTo}: Props) {
                 }
             )
             if (result.ok) {
-                console.log(redirectTo);
-                window.location.replace("/admin");
+                window.location.replace(redirectTo ?? "/");
             } else {
                 const {message} = await result.json();
                 window.alert(message);
@@ -51,7 +50,7 @@ export default function LoginForm({redirectTo}: Props) {
                     <div className="font-bold text-2xl mb-3">
                         Welcome!
                     </div>
-                    <div>
+                    {/*<div>
                         Hello, I am Gawon Kim. Thank you for visiting. This place was created for my {" "}
                         <span className={"underline"}>
                     personal use only.
@@ -62,7 +61,7 @@ export default function LoginForm({redirectTo}: Props) {
                 gawon.grove@gmail.com
                 </span>
                         {" "}for one.
-                    </div>
+                    </div>*/}
                 </div>
 
                 <div className={"box-border shadow-md bg-[#] p-3 rounded-xl"}>
