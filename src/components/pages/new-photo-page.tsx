@@ -5,14 +5,24 @@ import {TextInput} from "@/components/ui/text-input";
 import {Button} from "@/components/ui/button";
 import {z} from "zod";
 import {supabaseBrowserClient} from "@/lib/supabase.browser";
+import {ControlPosition, Map, Map as MapPrimitive, MapControl, MapMouseEvent} from "@vis.gl/react-google-maps";
+import {PlaceSearch} from "@/components/ui/place-search";
+import {Marker} from "@/components/ui/google-map";
+import {Location} from "@/types";
+import {LocationPicker} from "@/components/ui/location-picker";
+
+
 
 export function NewPhotoPage() {
     const [image, setImage] = useState<SelectedImage|null>(null);
     const [countryName, setCountryName] = useState<string>("");
     const [cityName, setCityName] = useState<string>("");
-    const [countryCode, setCountryCode] = useState<string>("");
+    const [location, setLocation] = useState<Location|null>(null);
+    const [takenAt, setTakenAt] = useState<string | null>(null);
+    const [hashTags , setHashTags] = useState<string[]>([]);
 
     console.log(image);
+    console.log(location)
 
     const policy: ImageSelectorPolicy  = {
         maximumBytes: 500 * 1024,
@@ -132,32 +142,74 @@ export function NewPhotoPage() {
         return {ok: false, error: parseResult.error.issues[0].message}
     }
 
+    function handleMapClick(e : MapMouseEvent) {
+        const location = e.detail.latLng;
+        if (!location) return;
+
+        const {lat, lng} = location;
+
+    }
+
     return (
-        <div>
-            <ImageSelector name={"image"} file={image} onFileChange={setImage} policy={policy}/>
-
-            <div className="border-b-gray-300 border-b-1 focus-within:border-b-[#4a6248d4]">
-                <div className={"font-bold"}>Country Name</div>
-                <TextInput
-                    name={"country-name"}
-                    value={countryName}
-                    onValueChange={setCountryName}
-                />
+        <div className={"h-full w-full flex"}>
+            <div className="flex-1 flex flex-col justify-center">
+                {image && (
+                    <div className={"w-[50%] m-auto box-border p-2 shadow"}>
+                        <img src={image.previewUrl} alt={"preview image"} />
+                        {location && countryName && cityName && (
+                            <div>
+                                {countryName}, {cityName}, {location.placeName ?? location.address}
+                            </div>
+                        )}
+                        {takenAt && (
+                            <div>{takenAt}</div>
+                        )}
+                        <div>
+                        </div>
+                    </div>
+                )}
             </div>
+            <aside className="w-[40%] h-full overflow-y-scroll box-borer p-3 pb-50 border border-gray-200 text-sm rounded-l-3xl">
+                <div>
+                    <div className={"font-bold"}>Image</div>
+                    <ImageSelector name={"image"} file={image} onFileChange={setImage} policy={policy}/>
+                </div>
 
-            <div className="border-b-gray-300 border-b-1 focus-within:border-b-[#4a6248d4]">
-                <div className={"font-bold"}>City Name</div>
-                <TextInput
-                    name={"city-name"}
-                    value={cityName}
-                    onValueChange={setCityName}
-                />
-            </div>
 
-            <Button onClick={handleSubmit}>submit</Button>
+                <div className="border-b-gray-300 border-b-1 focus-within:border-b-[#4a6248d4]">
+                    <div className={"font-bold"}>Country Name</div>
+                    <TextInput
+                        name={"country-name"}
+                        value={countryName}
+                        onValueChange={setCountryName}
+                    />
+                </div>
+
+                <div className="border-b-gray-300 border-b-1 focus-within:border-b-[#4a6248d4]">
+                    <div className={"font-bold"}>City Name</div>
+                    <TextInput
+                        name={"city-name"}
+                        value={cityName}
+                        onValueChange={setCityName}
+                    />
+                </div>
+
+                <div className="border-b-gray-300 border-b-1 focus-within:border-b-[#4a6248d4]">
+                    <div className={"font-bold"}>Location</div>
+                    <div className={"w-full aspect-square"}>
+                        <LocationPicker location={location} setLocation={setLocation}/>
+                    </div>
+
+                </div>
+
+                <Button onClick={handleSubmit}>submit</Button>
+            </aside>
+
 
         </div>
 
-
     )
 }
+
+
+

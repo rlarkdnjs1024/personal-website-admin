@@ -10,12 +10,9 @@ type HashTagInputProps = {
     maxLength?: number,
 }
 
-export function HashTagInput({hashtags, onChange, maxCount, minLength, maxLength}: HashTagInputProps) {
+export function HashTagInput({hashtags, onChange, maxCount, maxLength}: HashTagInputProps) {
 
     const [inputText, setInputText] = useState("");
-
-    const errorMessage =
-        hashtags.length === maxCount && inputText.trim() ? `You can add up to ${maxCount} hashtags.` : "";
 
     //text input에서 발생한 key Down event를 처리한다.
     function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
@@ -66,10 +63,8 @@ export function HashTagInput({hashtags, onChange, maxCount, minLength, maxLength
                 value={inputText}
                 onValueChange={setInputText}
                 onKeyDown={handleKeyDown}
-                minLength={minLength}
                 maxLength={maxLength}
                 className="border-0 inline w-1/3"
-                errorMessage={errorMessage}
             />
         </div>
 

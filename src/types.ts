@@ -1,10 +1,11 @@
-
-export type LatLngLiteral = {
-    lat: number,
-    lng: number
+export type Location = {
+    coordinate: Coordinate,
+    address: string,
+    placeName?: string,
+    placeId?: string,
 }
 
-export const DefaultGeoLocation: LatLngLiteral = {
-    lat: 51,
-    lng: 0,
+export type Coordinate = {
+    lat: number,
+    lng: number,
 }

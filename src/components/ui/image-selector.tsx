@@ -28,13 +28,8 @@ export type SelectedImage = {
     uploadMimeType: string,
 
     //EXIF 데이터를 가져오지만 없을 수도 있다.
-    originalLocation?: LatLngLiteral,
-    takenAt?: string,
-
-    //지도에서 나라와 도시로 marker clustering을 하기 위해 필요한 값들.
-    countryName?: string,
-    cityName?: string,
-
+    originalLocation: LatLngLiteral|null,
+    takenAt: string|null,
     previewUrl: string,
 }
 
@@ -133,17 +128,17 @@ export function ImageSelector({name, file, onFileChange, policy}: ImageSelectorP
 
         try {
             //0. 변환 과정 전에 필요한 EXIF 정보들을 파싱한다.
-            let originalLocation, originalDate;
+            let location, takenAt;
             try {
                 const exifData = await exif.parse(inputFile);
 
                 if (exifData?.latitude !== undefined && exifData?.longitude !== undefined) {
-                    originalLocation = {
+                    location = {
                         lat: exifData.latitude as number,
                         lng: exifData.longitude as number,
                     }
                 }
-                originalDate = exifData?.DateTimeOriginal as Date;
+                takenAt = exifData?.DateTimeOriginal as Date;
             } catch (e) {
                 console.error("Failed to parse exif");
                 console.error(e);
@@ -218,8 +213,8 @@ export function ImageSelector({name, file, onFileChange, policy}: ImageSelectorP
                 uploadFile: adjustedWebp,
                 uploadMimeType: adjustedWebp.type,
                 originalName: inputFile.name,
-                originalLocation: originalLocation,
-                takenAt: originalDate && formatDate(originalDate),
+                originalLocation: location ?? null,
+                takenAt: takenAt === undefined ? null : formatDate(takenAt),
                 uploadSize: adjustedWebp.size,
                 uploadDimension: finalDimension,
                 previewUrl,
@@ -231,7 +226,7 @@ export function ImageSelector({name, file, onFileChange, policy}: ImageSelectorP
     }
 
     // 세 가지 상태(로딩 중 / 빈 상태 / 파일 선택됨)가 공유하는 바깥 박스 스타일
-    const boxBaseClass = "bg-gray-200 w-full h-50 box-border p-2 border border-green-900 border-dashed m-auto rounded-xl";
+    const boxBaseClass = "bg-gray-200 w-full h-20 box-border p-2 border border-green-900 border-dashed m-auto rounded-xl";
 
     function renderBox() {
         if (isLoading) {

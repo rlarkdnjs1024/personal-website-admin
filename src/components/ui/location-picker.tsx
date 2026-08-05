@@ -1,41 +1,21 @@
-import {useState} from "react";
-import {LatLngLiteral} from "@/types";
-import {Map, Marker} from '@/components/ui/google-map'
-import {MapMouseEvent} from "@vis.gl/react-google-maps";
+import {Location} from "@/types";
+import {Map} from "@vis.gl/react-google-maps";
+import {PlaceSearch} from "@/components/ui/place-search";
+import {Marker} from "@/components/ui/google-map";
 
-type LocationPickerProps = {
-    location: LatLngLiteral,
-    onMapClick: (e: MapMouseEvent) => void
-}
-
-export default function LocationPicker({location, onMapClick}: LocationPickerProps) {
-    const [isPickerOpen, setIsPickerOpen] = useState<boolean>(false);
-
+export function LocationPicker({location, setLocation}: {location: Location|null, setLocation: (location: Location) => void}) {
     return (
-        <div className="w-full box-border rounded-xl border border-gray-200 bg-white p-3 shadow-xl">
-            <div className="mb-2 flex justify-end">
-                <button
-                    onClick={() => setIsPickerOpen(false)}
-                    className="flex h-5 w-5 cursor-pointer items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600"
-                >
-                    ✕
-                </button>
-            </div>
+        <div className={"relative w-full aspect-square"}>
             <Map
-                disableDefaultUI
+                disableDefaultUI={true}
                 mapId="personal-website"
-                className="w-full aspect-square m-auto"
-                focusLocation={location}
                 defaultZoom={10}
-                defaultCenter={location}
-                onClick={onMapClick}
+                defaultCenter={{lat: 51, lng: 6}}
             >
-                <Marker
-                    location={location}
-                />
+                <PlaceSearch onLocationChange={setLocation} />
+                {location && <Marker location={location.coordinate}/>}
             </Map>
         </div>
 
     )
-
 }
