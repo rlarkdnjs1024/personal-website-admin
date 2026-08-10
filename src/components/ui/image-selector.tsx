@@ -7,8 +7,8 @@ import {
 import React, {useRef, useState} from "react";
 import imageCompression from "browser-image-compression";
 import * as exif from "exifr"
-import {LatLngLiteral} from "@/types";
 import {convertHeicToJpg, getImageType} from "@/lib/file";
+import {Coordinate} from "@/types";
 
 
 
@@ -28,7 +28,7 @@ export type SelectedImage = {
     uploadMimeType: string,
 
     //EXIF 데이터를 가져오지만 없을 수도 있다.
-    originalLocation: LatLngLiteral|null,
+    originalLocation: Coordinate|null,
     takenAt: string|null,
     previewUrl: string,
 }

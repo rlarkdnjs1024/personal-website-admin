@@ -108,5 +108,15 @@ export function extractFileName (originalName: string) {
     return lastIndex > -1 ? originalName.slice(0, lastIndex) : originalName;
 }
 
+//2글자의 country code를 국기 특수문자로 바꾼다.
+export function countryCodeToFlag(countryCode: string): string {
+    return countryCode
+        .toUpperCase()
+        .split("")
+        .map(char =>
+            String.fromCodePoint(127397 + char.charCodeAt(0))
+        )
+        .join("");
+}
 
 

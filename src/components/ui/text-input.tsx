@@ -3,7 +3,7 @@ import {KeyboardEventHandler} from "react";
 
 type TextInputProps = {
     name: string,
-    value: string,
+    value?: string,
     onValueChange: (value: string) => void,
     onKeyDown?: KeyboardEventHandler<HTMLInputElement>,
     maxLength?: number,

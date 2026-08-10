@@ -14,9 +14,25 @@ export type Database = {
   }
   public: {
     Tables: {
+      tb_country: {
+        Row: {
+          code: string
+          name: string
+        }
+        Insert: {
+          code: string
+          name: string
+        }
+        Update: {
+          code?: string
+          name?: string
+        }
+        Relationships: []
+      }
       tb_photos: {
         Row: {
           city_name: string
+          comment: string | null
           country_code: string
           country_name: string
           created_at: string
@@ -34,6 +50,7 @@ export type Database = {
         }
         Insert: {
           city_name: string
+          comment?: string | null
           country_code: string
           country_name: string
           created_at?: string
@@ -51,6 +68,7 @@ export type Database = {
         }
         Update: {
           city_name?: string
+          comment?: string | null
           country_code?: string
           country_name?: string
           created_at?: string

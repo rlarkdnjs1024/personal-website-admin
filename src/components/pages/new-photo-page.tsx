@@ -5,17 +5,21 @@ import {TextInput} from "@/components/ui/text-input";
 import {Button} from "@/components/ui/button";
 import {z} from "zod";
 import {supabaseBrowserClient} from "@/lib/supabase.browser";
-import {ControlPosition, Map, Map as MapPrimitive, MapControl, MapMouseEvent} from "@vis.gl/react-google-maps";
-import {PlaceSearch} from "@/components/ui/place-search";
-import {Marker} from "@/components/ui/google-map";
 import {Location} from "@/types";
 import {LocationPicker} from "@/components/ui/location-picker";
+import {SelectBox, SelectOption} from "@/components/ui/select-box";
+import {countryCodeToFlag} from "@/lib/utils";
 
 
-
-export function NewPhotoPage() {
+type NewPhotoPageProps = {
+    countryList: {
+        name: string,
+        code: string,
+    }[]
+}
+export function NewPhotoPage({countryList}: NewPhotoPageProps) {
     const [image, setImage] = useState<SelectedImage|null>(null);
-    const [countryName, setCountryName] = useState<string>("");
+    const [countryName, setCountryName] = useState<string|null>(null);
     const [cityName, setCityName] = useState<string>("");
     const [location, setLocation] = useState<Location|null>(null);
     const [takenAt, setTakenAt] = useState<string | null>(null);
@@ -142,14 +146,6 @@ export function NewPhotoPage() {
         return {ok: false, error: parseResult.error.issues[0].message}
     }
 
-    function handleMapClick(e : MapMouseEvent) {
-        const location = e.detail.latLng;
-        if (!location) return;
-
-        const {lat, lng} = location;
-
-    }
-
     return (
         <div className={"h-full w-full flex"}>
             <div className="flex-1 flex flex-col justify-center">
@@ -176,13 +172,18 @@ export function NewPhotoPage() {
                 </div>
 
 
-                <div className="border-b-gray-300 border-b-1 focus-within:border-b-[#4a6248d4]">
-                    <div className={"font-bold"}>Country Name</div>
-                    <TextInput
-                        name={"country-name"}
+                <div>
+                    <div className="font-bold">Country</div>
+
+                    <SelectBox
                         value={countryName}
                         onValueChange={setCountryName}
-                    />
+                        placeholder={"Select a country"}
+                    >
+                        {countryList.map(x => <SelectOption key={x.code} optionValue={x.code} label={`${countryCodeToFlag(x.code)} ${x.name}`}/>)}
+
+                    </SelectBox>
+
                 </div>
 
                 <div className="border-b-gray-300 border-b-1 focus-within:border-b-[#4a6248d4]">
@@ -191,6 +192,7 @@ export function NewPhotoPage() {
                         name={"city-name"}
                         value={cityName}
                         onValueChange={setCityName}
+                        placeholder={"Type to search existing city or add yourself"}
                     />
                 </div>
 
@@ -210,6 +212,8 @@ export function NewPhotoPage() {
 
     )
 }
+
+
 
 
 
