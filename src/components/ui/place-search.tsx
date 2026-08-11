@@ -12,7 +12,6 @@ type PlaceSearchProps = {
 };
 
 
-
 export function PlaceSearch({onLocationChange,}: PlaceSearchProps) {
     const inputRef = useRef<HTMLInputElement>(null);
 

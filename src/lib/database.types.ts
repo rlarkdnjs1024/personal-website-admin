@@ -184,7 +184,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_distinct_cities: {
+        Args: never
+        Returns: {
+          city_name: string
+        }[]
+      }
+      search_city_name: {
+        Args: { search_text: string }
+        Returns: {
+          city_name: string
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never

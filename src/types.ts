@@ -9,3 +9,8 @@ export type Coordinate = {
     lat: number,
     lng: number,
 }
+
+export type Datetime = {
+    date: string;
+    time: string;
+};

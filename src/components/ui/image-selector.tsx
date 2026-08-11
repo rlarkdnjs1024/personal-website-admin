@@ -29,7 +29,7 @@ export type SelectedImage = {
 
     //EXIF 데이터를 가져오지만 없을 수도 있다.
     originalLocation: Coordinate|null,
-    takenAt: string|null,
+    takenAt: Date|null,
     previewUrl: string,
 }
 
@@ -76,14 +76,6 @@ function decodeImage(file: File): Promise<{ url: string, dimension: ImageDimensi
 
         image.src = url;
     });
-}
-
-function formatDate(date: Date): string {
-    const year = date.getUTCFullYear();
-    const month = String(date.getUTCMonth() + 1).padStart(2, "0");
-    const day = String(date.getUTCDate()).padStart(2, "0");
-
-    return `${year}-${month}-${day}`;
 }
 
 export function ImageSelector({name, file, onFileChange, policy}: ImageSelectorProps) {
@@ -214,7 +206,7 @@ export function ImageSelector({name, file, onFileChange, policy}: ImageSelectorP
                 uploadMimeType: adjustedWebp.type,
                 originalName: inputFile.name,
                 originalLocation: location ?? null,
-                takenAt: takenAt === undefined ? null : formatDate(takenAt),
+                takenAt: takenAt ?? null,
                 uploadSize: adjustedWebp.size,
                 uploadDimension: finalDimension,
                 previewUrl,

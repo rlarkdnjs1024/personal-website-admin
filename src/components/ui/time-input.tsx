@@ -3,10 +3,10 @@ type DatePickerProps = {
     onValueChange: (value: string) => void;
 }
 
-export default function DatePicker({value, onValueChange}: DatePickerProps) {
+export default function TimePicker({value, onValueChange}: DatePickerProps) {
     return (
         <input
-            type="date"
+            type="time"
             value={value ?? undefined}
             onChange={(e) => onValueChange(e.target.value)}
         />

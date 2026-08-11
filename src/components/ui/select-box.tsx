@@ -1,23 +1,23 @@
-import {SelectBoxContext} from "@/context/select-box-context";
+import {SelectBoxContext, useSelectBoxContext} from "@/context/select-box-context";
 import {cn} from "@/lib/utils";
 import React, {useContext, useState} from "react";
 
-type SelectBoxProps = {
-    value: string|null;
-    onValueChange: (value: string) => void;
+type SelectBoxProps<T> = {
+    value: T|null;
+    onValueChange: (value: T) => void;
     placeholder: string;
     children: React.ReactNode;
     className?: string;
 }
 
 
-export function SelectBox({value, onValueChange, placeholder, children, className}: SelectBoxProps) {
+export function SelectBox<T>({value, onValueChange, placeholder, children, className}: SelectBoxProps<T>) {
 
     const [displayValue, setDisplayValue] = useState<string>(placeholder);
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const isDefaultValue = displayValue === placeholder;
 
-    const handleValueChange = (value: string, label: string) => {
+    const handleValueChange = (value: T, label: string) => {
         onValueChange(value);
         setDisplayValue(label);
         setIsOpen(false);
@@ -58,14 +58,14 @@ export function SelectBox({value, onValueChange, placeholder, children, classNam
 }
 
 
-type SelectOptionProps = {
-    optionValue: string;
-    label: string
+type SelectOptionProps<T> = {
+    optionValue: T;
+    label: string;
     className?: string;
 }
 
-export function SelectOption({optionValue, label, className}: SelectOptionProps) {
-    const context = useContext(SelectBoxContext);
+export function SelectOption<T>({optionValue, label, className}: SelectOptionProps<T>) {
+    const context = useSelectBoxContext();
 
     if (!context) {
         throw new Error("SelectOption should be used within the SelectBox");
