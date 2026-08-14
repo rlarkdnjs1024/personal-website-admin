@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
 
     const searchParams = request.nextUrl.searchParams;
     const takenAt = searchParams.get("takenAt");
-    const parseResult = z.iso.date().safeParse(takenAt);
+    const parseResult = z.iso.datetime({local: true}).safeParse(takenAt);
 
 
     if (!parseResult.success) {

@@ -29,8 +29,35 @@ export type Database = {
         }
         Relationships: []
       }
+      tb_photo_hashtags: {
+        Row: {
+          photo_seq: number | null
+          seq: number
+          tag: string | null
+        }
+        Insert: {
+          photo_seq?: number | null
+          seq?: number
+          tag?: string | null
+        }
+        Update: {
+          photo_seq?: number | null
+          seq?: number
+          tag?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tb_photo_hashtags_photo_seq_fkey"
+            columns: ["photo_seq"]
+            isOneToOne: false
+            referencedRelation: "tb_photos"
+            referencedColumns: ["seq"]
+          },
+        ]
+      }
       tb_photos: {
         Row: {
+          address: string | null
           city_name: string
           comment: string | null
           country_code: string
@@ -41,6 +68,8 @@ export type Database = {
           latitude: number
           longitude: number
           mime_type: string
+          place_id: string | null
+          place_name: string | null
           seq: number
           status: string
           storage_path: string
@@ -49,6 +78,7 @@ export type Database = {
           width: number | null
         }
         Insert: {
+          address?: string | null
           city_name: string
           comment?: string | null
           country_code: string
@@ -59,6 +89,8 @@ export type Database = {
           latitude: number
           longitude: number
           mime_type: string
+          place_id?: string | null
+          place_name?: string | null
           seq?: number
           status?: string
           storage_path: string
@@ -67,6 +99,7 @@ export type Database = {
           width?: number | null
         }
         Update: {
+          address?: string | null
           city_name?: string
           comment?: string | null
           country_code?: string
@@ -77,6 +110,8 @@ export type Database = {
           latitude?: number
           longitude?: number
           mime_type?: string
+          place_id?: string | null
+          place_name?: string | null
           seq?: number
           status?: string
           storage_path?: string

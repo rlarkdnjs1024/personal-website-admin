@@ -26,12 +26,14 @@ export function NewPhotoPage({countryList}: NewPhotoPageProps) {
     const [country, setCountry] = useState<{code: string, name: string}|null>(null);
     const [cityName, setCityName] = useState<string>("");
     const [location, setLocation] = useState<Location|null>(null);
-    const [takenAt, setTakenAt] = useState<Datetime|null>(null);
+    const [takenAt, setTakenAt] = useState<string>("");
     const [comment, setComment] = useState<string>("");
-    const [hashTags , setHashTags] = useState<string[]>([]);
+    const [hashTags, setHashTags] = useState<string[]>([]);
 
 
-    console.log(image)
+    console.log(image);
+    console.log(takenAt);
+    console.log(country)
 
     const policy: ImageSelectorPolicy  = {
         maximumBytes: 500 * 1024,
@@ -52,11 +54,9 @@ export function NewPhotoPage({countryList}: NewPhotoPageProps) {
         getUploadUrlPath.searchParams.set("takenAt", dto.data!.takenAt);
 
         //서버에서 사진 업로드용 signed url을 받아온다.
-
         let result;
         try {
             result = await fetch(getUploadUrlPath);
-
         } catch (e) {
             console.error(e)
             window.alert("Network Error");
@@ -66,7 +66,6 @@ export function NewPhotoPage({countryList}: NewPhotoPageProps) {
         let uploadUrl
         try {
             uploadUrl = await result.json();
-
             if (!result.ok) {
                 window.alert(uploadUrl.message);
                 return;
@@ -112,24 +111,33 @@ export function NewPhotoPage({countryList}: NewPhotoPageProps) {
             window.alert("Network error");
             return;
         }
-
-
     }
 
     function toDto() {
+         debugger
 
-        if (!image) return {ok: false, error: "image not found"};
+        if (!image) return {ok: false, error: "Image is not attached"};
 
         const scheme = z.object({
             mimeType: z.string(),
             fileSizeBytes: z.number().int("fileSizeBytes must be an integer").positive("fileSizeBytes must be a positive number"),
             width: z.number().int("width must be an integer").positive("width must be a positive number"),
             height: z.number().int("height must be an integer").positive("height must be a positive number"),
-            takenAt: z.iso.date("takenAt must be a valid date in YYYY-MM-DD format"),
+            takenAt: z.iso.datetime({
+                local: true
+                ,error: "takenAt must be a valid date in YYYY-MM-DDTHH:mm:ss format"
+            }),
             countryName: z.string().max(50, "countryName must be at most 50 characters"),
+            countryCode: z.string().min(2).max(2),
             cityName: z.string().max(50, "cityName must be at most 50 characters"),
             latitude: z.number().min(-90, "latitude must be at least -90").max(90, "latitude must be at most 90"),
             longitude: z.number().min(-180, "longitude must be at least -180").max(180, "longitude must be at most 180"),
+            comment: z.string().min(0, "comment is missing"),
+            address: z.string().min(0, "address is missing"),
+            placeName: z.string().min(0, "placeName is missing"),
+            placeId: z.string().min(0, "placeId is missing"),
+            hashTags: z.array(z.string()),
+
         });
 
         const parseResult = scheme.safeParse({
@@ -137,11 +145,17 @@ export function NewPhotoPage({countryList}: NewPhotoPageProps) {
             fileSizeBytes: image.uploadSize,
             width: image.uploadDimension.width,
             height: image.uploadDimension.height,
-            takenAt: image.takenAt,
+            takenAt: takenAt,
             countryName: country?.name,
+            countryCode: country?.code,
             cityName: cityName,
-            latitude: image.originalLocation?.lat,
-            longitude: image.originalLocation?.lng,
+            latitude: location?.coordinate.lat,
+            longitude: location?.coordinate.lng,
+            comment: comment,
+            address: location?.address,
+            placeName: location?.placeName,
+            placeId: location?.placeId,
+            hashTags: hashTags,
         });
 
         if (parseResult.success) {
@@ -176,7 +190,7 @@ export function NewPhotoPage({countryList}: NewPhotoPageProps) {
             const hour = String(date.getHours()).padStart(2, "0");
             const minute = String(date.getMinutes()).padStart(2, "0");
             const second = String(date.getSeconds()).padStart(2, "0");
-            setTakenAt({date: `${year}-${month}-${day}`, time: `${hour}:${minute}:${second}`});
+            setTakenAt(`${year}-${month}-${day}T${hour}:${minute}:${second}`);
         }
     }
 
@@ -193,7 +207,7 @@ export function NewPhotoPage({countryList}: NewPhotoPageProps) {
                             </div>
                         )}
                         {takenAt && (
-                            <div>{takenAt.date} {takenAt.time}</div>
+                            <div>{takenAt}</div>
                         )}
                         <div>
                         </div>

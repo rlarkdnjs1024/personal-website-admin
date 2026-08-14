@@ -53,10 +53,14 @@ export async function POST(request: NextRequest) {
                 uploaded_by: user.seq,
                 taken_at: parseResult.data.takenAt,
                 country_name: parseResult.data.countryName,
-                country_code: "GP",
+                country_code: parseResult.data.countryCode,
                 city_name: parseResult.data.cityName,
                 latitude: parseResult.data.latitude,
-                longitude: parseResult.data.longitude
+                longitude: parseResult.data.longitude,
+                comment: parseResult.data.comment,
+                address: parseResult.data.address,
+                place_name: parseResult.data.placeName,
+                place_id: parseResult.data.placeId,
             });
 
         if (error) {
