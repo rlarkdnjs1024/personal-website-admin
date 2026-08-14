@@ -27,7 +27,9 @@ export function NewPhotoPage({countryList}: NewPhotoPageProps) {
     const [cityName, setCityName] = useState<string>("");
     const [location, setLocation] = useState<Location|null>(null);
     const [takenAt, setTakenAt] = useState<Datetime|null>(null);
+    const [comment, setComment] = useState<string>("");
     const [hashTags , setHashTags] = useState<string[]>([]);
+
 
     console.log(image)
 
@@ -46,14 +48,14 @@ export function NewPhotoPage({countryList}: NewPhotoPageProps) {
             return;
         }
 
-        const url = new URL("/api/admin/photos/uploadUrl", window.location.origin);
-        url.searchParams.set("takenAt", dto.data!.takenAt);
+        const getUploadUrlPath = new URL("/api/admin/photos/uploadUrl", window.location.origin);
+        getUploadUrlPath.searchParams.set("takenAt", dto.data!.takenAt);
 
         //서버에서 사진 업로드용 signed url을 받아온다.
 
         let result;
         try {
-            result = await fetch(url);
+            result = await fetch(getUploadUrlPath);
 
         } catch (e) {
             console.error(e)
@@ -250,6 +252,8 @@ export function NewPhotoPage({countryList}: NewPhotoPageProps) {
                 <div >
                     <div className={"font-bold"}>Comments</div>
                     <textarea
+                        value={comment}
+                        onChange={(e) => setComment(e.target.value)}
                         className="
                         w-full h-32
                         resize-none
@@ -262,6 +266,7 @@ export function NewPhotoPage({countryList}: NewPhotoPageProps) {
                         outline-none
                         focus:border-[#4a6248d4]"
                         placeholder="Write a comment about your photo."
+
                     />
                 </div>
 
