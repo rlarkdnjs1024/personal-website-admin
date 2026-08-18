@@ -57,9 +57,9 @@ export type Database = {
       }
       tb_photos: {
         Row: {
-          address: string | null
+          address: string
           city_name: string
-          comment: string | null
+          comment: string
           country_code: string
           country_name: string
           created_at: string
@@ -68,8 +68,8 @@ export type Database = {
           latitude: number
           longitude: number
           mime_type: string
-          place_id: string | null
-          place_name: string | null
+          place_id: string
+          place_name: string
           seq: number
           status: string
           storage_path: string
@@ -78,9 +78,9 @@ export type Database = {
           width: number | null
         }
         Insert: {
-          address?: string | null
+          address: string
           city_name: string
-          comment?: string | null
+          comment: string
           country_code: string
           country_name: string
           created_at?: string
@@ -89,8 +89,8 @@ export type Database = {
           latitude: number
           longitude: number
           mime_type: string
-          place_id?: string | null
-          place_name?: string | null
+          place_id: string
+          place_name: string
           seq?: number
           status?: string
           storage_path: string
@@ -99,9 +99,9 @@ export type Database = {
           width?: number | null
         }
         Update: {
-          address?: string | null
+          address?: string
           city_name?: string
-          comment?: string | null
+          comment?: string
           country_code?: string
           country_name?: string
           created_at?: string
@@ -110,8 +110,8 @@ export type Database = {
           latitude?: number
           longitude?: number
           mime_type?: string
-          place_id?: string | null
-          place_name?: string | null
+          place_id?: string
+          place_name?: string
           seq?: number
           status?: string
           storage_path?: string
@@ -219,6 +219,28 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_photo: {
+        Args: {
+          p_address: string
+          p_city_name: string
+          p_comment: string
+          p_country_code: string
+          p_country_name: string
+          p_file_size_bytes: number
+          p_hash_tags: string[]
+          p_height: number
+          p_latitude: number
+          p_longitude: number
+          p_mime_type: string
+          p_place_id: string
+          p_place_name: string
+          p_storage_path: string
+          p_taken_at: string
+          p_uploaded_by: number
+          p_width: number
+        }
+        Returns: number
+      }
       get_distinct_cities: {
         Args: never
         Returns: {

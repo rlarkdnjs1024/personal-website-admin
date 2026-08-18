@@ -26,7 +26,10 @@ export function SelectBox<T>({value, onValueChange, placeholder, children, class
     return (
         <SelectBoxContext.Provider value={{value, handleValueChange}}>
             <div className={cn("relative w-full", className)}>
-                <div className="h-10 rounded-md shadow px-2 bg-white">
+                <div className={cn(
+                    "h-10 rounded-lg border px-3 bg-white transition-colors",
+                    isOpen ? "border-[#4a6248d4]" : "border-gray-200"
+                )}>
                     <div className="flex items-center h-full">
                         <div className="flex-1">
                             <span className={isDefaultValue ? "text-gray-400" : undefined}>
@@ -44,7 +47,7 @@ export function SelectBox<T>({value, onValueChange, placeholder, children, class
 
                 {
                     isOpen && (
-                        <div className="absolute top-full left-0 z-10 mt-1 w-full rounded-md bg-white shadow max-h-50 overflow-y-scroll">
+                        <div className="absolute top-full left-0 z-10 mt-1 w-full rounded-lg bg-white shadow-md max-h-50 overflow-y-scroll">
                             {children}
                         </div>
                     )

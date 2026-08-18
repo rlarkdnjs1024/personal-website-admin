@@ -12,7 +12,7 @@ export function Button({onClick, className, children}: ButtonProps) {
         <button
             type="button"
             onClick={onClick}
-            className={cn("hover:cursor-pointer hover:bg-gray-100 rounded-md box-border pr-1 pl-1 border border-green-900 bg-[#FFFFFFB3]", className)}
+            className={cn("hover:cursor-pointer rounded-md box-border px-4 py-2 text-sm font-medium text-white bg-[#4a6248d4] hover:bg-[#4a6248] transition-colors disabled:cursor-not-allowed disabled:opacity-60", className)}
         >
             {children}
         </button>

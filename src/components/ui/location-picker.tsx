@@ -1,4 +1,4 @@
-import {Location} from "@/types";
+import {Location} from "@/lib/types";
 import {Map} from "@vis.gl/react-google-maps";
 import {PlaceSearch} from "@/components/ui/place-search";
 import {Marker} from "@/components/ui/google-map";

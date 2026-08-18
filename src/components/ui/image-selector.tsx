@@ -8,7 +8,7 @@ import React, {useRef, useState} from "react";
 import imageCompression from "browser-image-compression";
 import * as exif from "exifr"
 import {convertHeicToJpg, getImageType} from "@/lib/file";
-import {Coordinate} from "@/types";
+import {Coordinate} from "@/lib/types";
 
 
 

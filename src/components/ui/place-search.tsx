@@ -5,7 +5,7 @@ import {
     useMap,
     useMapsLibrary,
 } from "@vis.gl/react-google-maps";
-import {Coordinate, Location} from "@/types";
+import {Coordinate, Location} from "@/lib/types";
 
 type PlaceSearchProps = {
     onLocationChange?: (location: Location) => void;
@@ -76,13 +76,13 @@ export function PlaceSearch({onLocationChange,}: PlaceSearchProps) {
     }, [map, placesLibrary, onLocationChange]);
 
     return (
-            <div className={"w-full absolute top-0"}>
+            <div className={"absolute top-2 left-2 right-2"}>
                 <input
                     ref={inputRef}
                     type="text"
                     placeholder="Enter a location."
                     className="
-                        w-full border border-gray-300
+                        w-full rounded-md border border-gray-300
                         bg-white px-4 py-3 text-sm shadow-md
                         outline-none focus:border-[#4a6248d4]
                     "

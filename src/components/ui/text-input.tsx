@@ -22,6 +22,7 @@ export function TextInput({name, value, onValueChange, onKeyDown, maxLength, pla
                 onKeyDown={onKeyDown}
                 placeholder={placeholder}
                 maxLength={maxLength}
+                autoComplete="off"
                 className={cn("w-full outline-none", className)}
             />
     )

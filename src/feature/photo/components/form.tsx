@@ -1,17 +1,17 @@
 "use client"
 import {ImageSelector, ImageSelectorPolicy, SelectedImage} from "@/components/ui/image-selector";
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {Button} from "@/components/ui/button";
 import {z} from "zod";
 import {supabaseBrowserClient} from "@/lib/supabase.browser";
-import {Datetime, Location} from "@/types";
 import {LocationPicker} from "@/components/ui/location-picker";
 import {SelectBox, SelectOption} from "@/components/ui/select-box";
 import {countryCodeToFlag} from "@/lib/utils";
 import {SearchInput} from "@/components/ui/search-input";
-import DatePicker from "@/components/ui/date-input";
 import {DatetimeInput} from "@/components/ui/datetime-input";
 import {HashTagInput} from "@/components/ui/hash-tag";
+import {Country, Location} from "@/feature/photo/type";
+import {PreviewPhotoCard} from "@/feature/photo/components/preview-photo-card";
 
 
 type NewPhotoPageProps = {
@@ -21,14 +21,15 @@ type NewPhotoPageProps = {
     }[]
 }
 
-export function NewPhotoPage({countryList}: NewPhotoPageProps) {
+export function Form({countryList}: NewPhotoPageProps) {
     const [image, setImage] = useState<SelectedImage|null>(null);
-    const [country, setCountry] = useState<{code: string, name: string}|null>(null);
+    const [country, setCountry] = useState<Country|null>(null);
     const [cityName, setCityName] = useState<string>("");
     const [location, setLocation] = useState<Location|null>(null);
     const [takenAt, setTakenAt] = useState<string>("");
     const [comment, setComment] = useState<string>("");
     const [hashTags, setHashTags] = useState<string[]>([]);
+
 
 
     console.log(image);
@@ -132,10 +133,10 @@ export function NewPhotoPage({countryList}: NewPhotoPageProps) {
             cityName: z.string().max(50, "cityName must be at most 50 characters"),
             latitude: z.number().min(-90, "latitude must be at least -90").max(90, "latitude must be at most 90"),
             longitude: z.number().min(-180, "longitude must be at least -180").max(180, "longitude must be at most 180"),
-            comment: z.string().min(0, "comment is missing"),
-            address: z.string().min(0, "address is missing"),
-            placeName: z.string().min(0, "placeName is missing"),
-            placeId: z.string().min(0, "placeId is missing"),
+            comment: z.string().min(1, "comment is missing"),
+            address: z.string().min(1, "address is missing"),
+            placeName: z.string().min(1, "placeName is missing"),
+            placeId: z.string().min(1, "placeId is missing"),
             hashTags: z.array(z.string()),
 
         });
@@ -194,112 +195,108 @@ export function NewPhotoPage({countryList}: NewPhotoPageProps) {
         }
     }
 
-
     return (
         <div className={"h-full w-full flex"}>
-            <div className="flex-1 flex flex-col justify-center">
-                {image && (
-                    <div className={"w-[50%] m-auto box-border p-2 shadow"}>
-                        <img src={image.previewUrl} alt={"preview image"} />
-                        {location && country && cityName && (
-                            <div>
-                                {country.name}, {cityName}, {location.placeName ?? location.address}
-                            </div>
-                        )}
-                        {takenAt && (
-                            <div>{takenAt}</div>
-                        )}
-                        <div>
+            <div className="relative flex-1 overflow-hidden ">
+                {/* subtle background */}
+                <div
+                    className="
+                        absolute inset-0
+                        opacity-[0.035]
+                        bg-[radial-gradient(#263526_1px,transparent_1px)]
+                        [background-size:22px_22px]
+                    "
+                />
+                <div className="relative flex h-full items-center justify-center p-12">
+                    <PreviewPhotoCard
+                        image={image}
+                        cityName={cityName}
+                        location={location} takenAt={takenAt} comment={comment} hashTags={hashTags}
+                    />
+                </div>
+            </div>
+            <aside className="w-[40%] h-full overflow-y-scroll box-border p-3 pb-50 border border-gray-200 text-sm rounded-l-3xl">
+                <div className="space-y-4">
+                    <div>
+                        <div className={"font-bold mb-1"}>Image</div>
+                        <ImageSelector name={"image"} file={image} onFileChange={handleImageChange} policy={policy}/>
+                    </div>
+
+                    <div>
+                        <div className="font-bold mb-1">Country</div>
+                        <SelectBox
+                            value={country}
+                            onValueChange={setCountry}
+                            placeholder={"Select a country"}
+                        >
+                            {countryList
+                                .map(x =>
+                                    <SelectOption key={x.code} optionValue={x} label={`${countryCodeToFlag(x.code)} ${x.name}`}/>
+                                )
+                            }
+                        </SelectBox>
+                    </div>
+
+                    <div>
+                        <div className={"font-bold mb-1"}>City Name</div>
+                        <div className="rounded-lg border border-gray-200 bg-white px-3 py-2 transition-colors focus-within:border-[#4a6248d4]">
+                            <SearchInput
+                                name="city-name"
+                                value={cityName}
+                                onValueChange={setCityName}
+                                getSuggestions={searchCityName}
+                                placeholder={"Type to search existing city or add yourself"}
+                            />
                         </div>
                     </div>
-                )}
-            </div>
-            <aside className="w-[40%] h-full overflow-y-scroll box-borer p-3 pb-50 border border-gray-200 text-sm rounded-l-3xl">
-                <div>
-                    <div className={"font-bold"}>Image</div>
-                    <ImageSelector name={"image"} file={image} onFileChange={handleImageChange} policy={policy}/>
-                </div>
 
-
-                <div>
-                    <div className="font-bold">Country</div>
-
-                    <SelectBox
-                        value={country}
-                        onValueChange={setCountry}
-                        placeholder={"Select a country"}
-                    >
-                        {countryList
-                            .map(x =>
-                                <SelectOption key={x.code} optionValue={x} label={`${countryCodeToFlag(x.code)} ${x.name}`}/>
-                            )
-                        }
-
-                    </SelectBox>
-
-                </div>
-
-                <div className="border-b-gray-300 border-b-1 focus-within:border-b-[#4a6248d4]">
-                    <div className={"font-bold"}>City Name</div>
-                    <SearchInput
-                        name="city-name"
-                        value={cityName}
-                        onValueChange={setCityName}
-                        getSuggestions={searchCityName}
-                        placeholder={"Type to search existing city or add yourself"}
-                    />
-                </div>
-
-                <div className="border-b-gray-300 border-b-1 focus-within:border-b-[#4a6248d4]">
-                    <div className={"font-bold"}>Location</div>
-                    <div className={"w-full aspect-square"}>
-                        <LocationPicker location={location} setLocation={setLocation}/>
+                    <div>
+                        <div className={"font-bold mb-1"}>Location</div>
+                        <div className="w-full aspect-square overflow-hidden rounded-lg border border-gray-200">
+                            <LocationPicker location={location} setLocation={setLocation}/>
+                        </div>
                     </div>
-                </div>
 
-                <div >
-                    <div className={"font-bold"}>Date and Time</div>
-
+                    <div>
+                        <div className={"font-bold mb-1"}>Date and Time</div>
                         <DatetimeInput name={"taken-at"} value={takenAt} onValueChange={setTakenAt}/>
+                    </div>
+                    <div>
+                        <div className={"font-bold mb-1"}>Comments</div>
+                        <textarea
+                            value={comment}
+                            onChange={(e) => setComment(e.target.value)}
+                            className="
+                                w-full h-32
+                                resize-none
+                                rounded-lg
+                                border border-gray-200
+                                bg-white
+                                px-3 py-2.5
+                                text-sm text-gray-700
+                                placeholder:text-gray-400
+                                outline-none
+                                focus:border-[#4a6248d4]
+                            "
+                            placeholder="Write a comment about your photo."
+                        />
+                    </div>
+
+                    <div className="pb-20">
+                        <div className={"font-bold mb-1"}>Hashtags</div>
+                        <HashTagInput hashtags={hashTags} onChange={setHashTags}/>
+                    </div>
+
+                    <Button
+                        className="m-auto"
+                        onClick={handleSubmit}
+                    >
+                        submit!
+                    </Button>
 
                 </div>
-                <div >
-                    <div className={"font-bold"}>Comments</div>
-                    <textarea
-                        value={comment}
-                        onChange={(e) => setComment(e.target.value)}
-                        className="
-                        w-full h-32
-                        resize-none
-                        rounded-lg
-                        border border-gray-200
-                        bg-white
-                        px-3 py-2.5
-                        text-sm text-gray-700
-                        placeholder:text-gray-400
-                        outline-none
-                        focus:border-[#4a6248d4]"
-                        placeholder="Write a comment about your photo."
-
-                    />
-                </div>
-
-                <div>
-                    <div className={"font-bold"}>Hashtags</div>
-                    <HashTagInput hashtags={hashTags} onChange={setHashTags}/>
-                </div>
-
-
-                <Button onClick={handleSubmit}>submit</Button>
             </aside>
-
-
         </div>
-
     )
 }
-
-
-
-
 

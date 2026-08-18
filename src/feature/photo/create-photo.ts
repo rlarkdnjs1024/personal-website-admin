@@ -1,6 +1,7 @@
-import {z} from "zod";
+import z from "zod";
+import {supabaseServerClient} from "@/lib/supabase.server";
 
-export const postPhotoSchema = z.object({
+const createPhotoSchema = z.object({
     storagePath: z.string().max(500, "storagePath must be at most 500 characters"),
     mimeType: z.string().max(100, "mimeType must be at most 100 characters"),
     fileSizeBytes: z.number().int("fileSizeBytes must be an integer").positive("fileSizeBytes must be a positive number"),
@@ -21,3 +22,44 @@ export const postPhotoSchema = z.object({
     placeId: z.string().min(0, "placeId is missing"),
     hashTags: z.array(z.string()),
 })
+
+export function parsePayload(payload: any): any {
+    return createPhotoSchema.safeParse(payload);
+}
+
+
+
+export type CreatePhotoData = z.infer<typeof createPhotoSchema>;
+export async function createPhoto(
+    data: CreatePhotoData,
+    uploadedBy: number,
+): Promise<number> {
+    console.log(data);
+    const {data: photoSeq, error} = await supabaseServerClient.rpc(
+        "create_photo",
+    {
+        p_storage_path: data.storagePath,
+        p_mime_type: data.mimeType,
+        p_file_size_bytes: data.fileSizeBytes,
+        p_width: data.width,
+        p_height: data.height,
+        p_uploaded_by: uploadedBy,
+        p_taken_at: data.takenAt,
+        p_country_code: data.countryCode,
+        p_country_name: data.countryName,
+        p_city_name: data.cityName,
+        p_latitude: data.latitude,
+        p_longitude: data.longitude,
+        p_comment: data.comment,
+        p_address: data.address,
+        p_place_name: data.placeName,
+        p_place_id: data.placeId,
+        p_hash_tags: data.hashTags,
+    });
+
+    if (error) {
+        throw error;
+    }
+
+    return photoSeq;
+}

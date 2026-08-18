@@ -1,4 +1,4 @@
-import {NewPhotoPage} from "@/components/pages/new-photo-page";
+import {Form} from "@/feature/photo/components/form";
 import {supabaseServerClient} from "@/lib/supabase.server";
 
 export default async function Page() {
@@ -9,5 +9,5 @@ export default async function Page() {
 
     if (error) throw error;
 
-    return <NewPhotoPage countryList={countryList ?? []}/>
+    return <Form countryList={countryList ?? []}/>
 }

@@ -49,7 +49,7 @@ export function HashTagInput({hashtags, onChange, maxCount, maxLength}: HashTagI
     }
 
     return (
-        <div className={"box-border p-1 border border-gray-500 rounded-lg"}>
+        <div className="box-border p-1 border border-gray-200 rounded-lg transition-colors focus-within:border-[#4a6248d4]">
             {hashtags.map(tag => (
                 <span key={tag} className="border border-green-800 rounded-lg mr-0.5">
                     {"#"}{tag}
