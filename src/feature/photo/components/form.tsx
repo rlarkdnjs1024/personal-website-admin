@@ -4,7 +4,7 @@ import {useState} from "react";
 import {Button} from "@/components/ui/button";
 import {z} from "zod";
 import {supabaseBrowserClient} from "@/lib/supabase.browser";
-import {LocationPicker} from "@/components/ui/location-picker";
+import {LocationPicker} from "@/feature/photo/components/location-picker";
 import {SelectBox, SelectOption} from "@/components/ui/select-box";
 import {countryCodeToFlag} from "@/lib/utils";
 import {SearchInput} from "@/components/ui/search-input";
@@ -183,6 +183,7 @@ export function Form({countryList}: NewPhotoPageProps) {
         setImage(image);
         //이미지가 존재하고 EXIF data에 찍힌 날짜가 존재하면 taken at 객체를 조정한다.
         const date = image?.takenAt;
+        const coordinate = image?.originalLocation
 
         if (date) {
             const year = date.getFullYear();
@@ -192,6 +193,13 @@ export function Form({countryList}: NewPhotoPageProps) {
             const minute = String(date.getMinutes()).padStart(2, "0");
             const second = String(date.getSeconds()).padStart(2, "0");
             setTakenAt(`${year}-${month}-${day}T${hour}:${minute}:${second}`);
+        }
+
+        if (coordinate) {
+            setLocation({
+                coordinate: coordinate,
+                address: "",
+            })
         }
     }
 

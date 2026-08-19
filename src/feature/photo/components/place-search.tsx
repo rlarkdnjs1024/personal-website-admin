@@ -1,11 +1,9 @@
 import {useEffect, useRef} from "react";
 import {
-    ControlPosition,
-    MapControl,
     useMap,
     useMapsLibrary,
 } from "@vis.gl/react-google-maps";
-import {Coordinate, Location} from "@/lib/types";
+import {Location} from "@/feature/photo/type";
 
 type PlaceSearchProps = {
     onLocationChange?: (location: Location) => void;
