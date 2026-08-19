@@ -1,17 +1,20 @@
 "use client"
 import {ImageSelector, ImageSelectorPolicy, SelectedImage} from "@/components/ui/image-selector";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {Button} from "@/components/ui/button";
 import {z} from "zod";
 import {supabaseBrowserClient} from "@/lib/supabase.browser";
-import {LocationPicker} from "@/feature/photo/components/location-picker";
+import {GooglePlacePicker} from "@/feature/photo/components/google-place-picker";
 import {SelectBox, SelectOption} from "@/components/ui/select-box";
 import {countryCodeToFlag} from "@/lib/utils";
 import {SearchInput} from "@/components/ui/search-input";
 import {DatetimeInput} from "@/components/ui/datetime-input";
 import {HashTagInput} from "@/components/ui/hash-tag";
-import {Country, Location} from "@/feature/photo/type";
-import {PreviewPhotoCard} from "@/feature/photo/components/preview-photo-card";
+import {Country, GooglePlace} from "@/feature/photo/type";
+import {PreviewPhotoCard} from "@/feature/photo/components/photo-card";
+import {useMap} from "@vis.gl/react-google-maps";
+import {SingleCheckBox} from "@/components/ui/checkbox";
+import {Coordinate} from "@/lib/types";
 
 
 type NewPhotoPageProps = {
@@ -25,21 +28,64 @@ export function Form({countryList}: NewPhotoPageProps) {
     const [image, setImage] = useState<SelectedImage|null>(null);
     const [country, setCountry] = useState<Country|null>(null);
     const [cityName, setCityName] = useState<string>("");
-    const [location, setLocation] = useState<Location|null>(null);
+    const [coordinate, setCoordinate] = useState<Coordinate|null>(null);
+    const [place, setPlace] = useState<GooglePlace|null>(null);
     const [takenAt, setTakenAt] = useState<string>("");
     const [comment, setComment] = useState<string>("");
     const [hashTags, setHashTags] = useState<string[]>([]);
+    const [useExifCoordinate, setUseExifCoordinate] = useState<boolean>(false);
 
 
 
-    console.log(image);
-    console.log(takenAt);
-    console.log(country)
+    console.log("이미지", image?.originalLocation);
+    console.log("구글 플레이스", place);
+    console.log("DB좌표", coordinate);
 
     const policy: ImageSelectorPolicy  = {
         maximumBytes: 500 * 1024,
         maximumWidthOrHeight: 1600,
     }
+
+    const map = useMap();
+
+    useEffect(() => {
+        //image가 삭제되면 촬영 날짜와 장소를 초기화한다.
+        if (!image) {
+            return;
+        }
+
+        //image를 등록하면 EXIF DATA에서 촬영 날짜와 위치를 set한다.
+        const date = image.takenAt;
+        const coordinate = image.originalLocation;
+
+        if (date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, "0");
+            const day = String(date.getDate()).padStart(2, "0");
+            const hour = String(date.getHours()).padStart(2, "0");
+            const minute = String(date.getMinutes()).padStart(2, "0");
+            const second = String(date.getSeconds()).padStart(2, "0");
+            setTakenAt(`${year}-${month}-${day}T${hour}:${minute}:${second}`);
+        }
+
+        if (coordinate && map) {
+            map.panTo(coordinate);
+            map.setZoom(15)
+        }
+
+    }, [image]);
+
+    //use EXIF location 옵션에 따라 coordinate synchronize
+    useEffect(() => {
+        if (useExifCoordinate) {
+            setCoordinate(image?.originalLocation ? {...image.originalLocation} : null);
+        }
+
+        else {
+            setCoordinate(place ? {...place.location} : null);
+        }
+    }, [useExifCoordinate, image, place]);
+
 
     async function handleSubmit() {
 
@@ -141,6 +187,8 @@ export function Form({countryList}: NewPhotoPageProps) {
 
         });
 
+        const coordinate = useExifCoordinate ? image.originalLocation! : place?.location!;
+
         const parseResult = scheme.safeParse({
             mimeType: image.uploadMimeType,
             fileSizeBytes: image.uploadSize,
@@ -150,12 +198,11 @@ export function Form({countryList}: NewPhotoPageProps) {
             countryName: country?.name,
             countryCode: country?.code,
             cityName: cityName,
-            latitude: location?.coordinate.lat,
-            longitude: location?.coordinate.lng,
+            latitude: coordinate?.lat,
+            longitude: coordinate?.lng,
             comment: comment,
-            address: location?.address,
-            placeName: location?.placeName,
-            placeId: location?.placeId,
+            placeName: place?.placeName,
+            placeId: place?.placeId,
             hashTags: hashTags,
         });
 
@@ -179,29 +226,6 @@ export function Form({countryList}: NewPhotoPageProps) {
         return json.data as string[];
     }
 
-    function handleImageChange(image: SelectedImage|null) {
-        setImage(image);
-        //이미지가 존재하고 EXIF data에 찍힌 날짜가 존재하면 taken at 객체를 조정한다.
-        const date = image?.takenAt;
-        const coordinate = image?.originalLocation
-
-        if (date) {
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, "0");
-            const day = String(date.getDate()).padStart(2, "0");
-            const hour = String(date.getHours()).padStart(2, "0");
-            const minute = String(date.getMinutes()).padStart(2, "0");
-            const second = String(date.getSeconds()).padStart(2, "0");
-            setTakenAt(`${year}-${month}-${day}T${hour}:${minute}:${second}`);
-        }
-
-        if (coordinate) {
-            setLocation({
-                coordinate: coordinate,
-                address: "",
-            })
-        }
-    }
 
     return (
         <div className={"h-full w-full flex"}>
@@ -219,7 +243,10 @@ export function Form({countryList}: NewPhotoPageProps) {
                     <PreviewPhotoCard
                         image={image}
                         cityName={cityName}
-                        location={location} takenAt={takenAt} comment={comment} hashTags={hashTags}
+                        place={place}
+                        takenAt={takenAt}
+                        comment={comment}
+                        hashTags={hashTags}
                     />
                 </div>
             </div>
@@ -227,7 +254,7 @@ export function Form({countryList}: NewPhotoPageProps) {
                 <div className="space-y-4">
                     <div>
                         <div className={"font-bold mb-1"}>Image</div>
-                        <ImageSelector name={"image"} file={image} onFileChange={handleImageChange} policy={policy}/>
+                        <ImageSelector name={"image"} file={image} onFileChange={setImage} policy={policy}/>
                     </div>
 
                     <div>
@@ -259,9 +286,20 @@ export function Form({countryList}: NewPhotoPageProps) {
                     </div>
 
                     <div>
-                        <div className={"font-bold mb-1"}>Location</div>
+                        <div className={"font-bold mb-1"}>Place</div>
+                        <SingleCheckBox
+                            value={useExifCoordinate}
+                            onValueChange={setUseExifCoordinate}
+                            disabled={!!!image?.originalLocation}
+                        >
+                            use EXIf location data
+                        </SingleCheckBox>
                         <div className="w-full aspect-square overflow-hidden rounded-lg border border-gray-200">
-                            <LocationPicker location={location} setLocation={setLocation}/>
+                            <GooglePlacePicker
+                                place={place}
+                                setPlace={setPlace}
+                                exifLocation={image?.originalLocation ?? null}
+                            />
                         </div>
                     </div>
 

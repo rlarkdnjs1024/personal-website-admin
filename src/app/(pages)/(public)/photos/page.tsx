@@ -1,13 +1,12 @@
 import {PhotoCard} from "@/feature/photo/components/photo-card";
-import {Country, Location} from "@/feature/photo/type";
+import {GooglePlace} from "@/feature/photo/type";
 import {SelectedImage} from "@/components/ui/image-selector";
 
 type PhotoListItem = {
     seq: number;
     image: SelectedImage;
-    country: Country;
     cityName: string;
-    location: Location;
+    place: GooglePlace;
     takenAt: string;
     comment: string;
     hashTags: string[];
@@ -18,12 +17,11 @@ const photoList: PhotoListItem[] = [
     {
         seq: 1,
         image: {previewUrl: "https://picsum.photos/seed/photo-1/800/800"} as SelectedImage,
-        country: {code: "JP", name: "Japan"},
         cityName: "Tokyo",
-        location: {
-            coordinate: {lat: 35.6586, lng: 139.7454},
-            address: "Shibuya, Tokyo, Japan",
+        place: {
             placeName: "Shibuya Crossing",
+            placeId: "place-shibuya-crossing",
+            location: {lat: 35.6586, lng: 139.7454},
         },
         takenAt: "2025-04-02T10:00:00",
         comment: "사람들 사이로 벚꽃이 흩날리던 시부야의 오후.",
@@ -32,12 +30,11 @@ const photoList: PhotoListItem[] = [
     {
         seq: 2,
         image: {previewUrl: "https://picsum.photos/seed/photo-2/800/800"} as SelectedImage,
-        country: {code: "FR", name: "France"},
         cityName: "Paris",
-        location: {
-            coordinate: {lat: 48.8584, lng: 2.2945},
-            address: "Champ de Mars, Paris, France",
+        place: {
             placeName: "Eiffel Tower",
+            placeId: "place-eiffel-tower",
+            location: {lat: 48.8584, lng: 2.2945},
         },
         takenAt: "2025-06-14T19:30:00",
         comment: "",
@@ -46,12 +43,11 @@ const photoList: PhotoListItem[] = [
     {
         seq: 3,
         image: {previewUrl: "https://picsum.photos/seed/photo-3/800/800"} as SelectedImage,
-        country: {code: "KR", name: "South Korea"},
         cityName: "Jeju",
-        location: {
-            coordinate: {lat: 33.3617, lng: 126.5292},
-            address: "Aewol-eup, Jeju, South Korea",
+        place: {
             placeName: "Hyeopjae Beach",
+            placeId: "place-hyeopjae-beach",
+            location: {lat: 33.3617, lng: 126.5292},
         },
         takenAt: "2025-08-01T16:20:00",
         comment: "여름 바다는 언제나 옳다.",
@@ -60,12 +56,11 @@ const photoList: PhotoListItem[] = [
     {
         seq: 4,
         image: {previewUrl: "https://picsum.photos/seed/photo-4/800/800"} as SelectedImage,
-        country: {code: "IT", name: "Italy"},
         cityName: "Rome",
-        location: {
-            coordinate: {lat: 41.8902, lng: 12.4922},
-            address: "Piazza del Colosseo, Rome, Italy",
+        place: {
             placeName: "Colosseum",
+            placeId: "place-colosseum",
+            location: {lat: 41.8902, lng: 12.4922},
         },
         takenAt: "2025-05-10T09:15:00",
         comment: "",
@@ -74,12 +69,11 @@ const photoList: PhotoListItem[] = [
     {
         seq: 5,
         image: {previewUrl: "https://picsum.photos/seed/photo-5/800/800"} as SelectedImage,
-        country: {code: "US", name: "United States"},
         cityName: "New York",
-        location: {
-            coordinate: {lat: 40.7580, lng: -73.9855},
-            address: "Manhattan, New York, USA",
+        place: {
             placeName: "Times Square",
+            placeId: "place-times-square",
+            location: {lat: 40.7580, lng: -73.9855},
         },
         takenAt: "2024-12-24T21:00:00",
         comment: "크리스마스 이브의 타임스퀘어는 낮보다 밝았다.",
@@ -88,12 +82,11 @@ const photoList: PhotoListItem[] = [
     {
         seq: 6,
         image: {previewUrl: "https://picsum.photos/seed/photo-6/800/800"} as SelectedImage,
-        country: {code: "PT", name: "Portugal"},
         cityName: "Lisbon",
-        location: {
-            coordinate: {lat: 38.7139, lng: -9.1394},
-            address: "Alfama, Lisbon, Portugal",
+        place: {
             placeName: "Alfama District",
+            placeId: "place-alfama-district",
+            location: {lat: 38.7139, lng: -9.1394},
         },
         takenAt: "2025-03-22T17:45:00",
         comment: "",
@@ -122,9 +115,8 @@ export default function Page() {
                         <PhotoCard
                             key={photo.seq}
                             image={photo.image}
-                            country={photo.country}
                             cityName={photo.cityName}
-                            location={photo.location}
+                            place={photo.place}
                             takenAt={photo.takenAt}
                             comment={photo.comment}
                             hashTags={photo.hashTags}

@@ -6,11 +6,12 @@ type SingleCheckBoxProps = {
     value: boolean,
     onValueChange: (value: boolean) => void,
     className?: string,
+    disabled?: boolean,
     children: React.ReactNode,
 }
 
 
-export function SingleCheckBox({value, onValueChange, className, children}: SingleCheckBoxProps) {
+export function SingleCheckBox({value, onValueChange, className, children, disabled}: SingleCheckBoxProps) {
     return (
         <label className={cn("flex items-center hover:cursor-pointer", className)}>
             <input
@@ -18,6 +19,7 @@ export function SingleCheckBox({value, onValueChange, className, children}: Sing
                 checked={value}
                 onChange={(e) => onValueChange(e.target.checked)}
                 className="mr-1 hover:cursor-pointer"
+                disabled={disabled}
             />
             {children}
         </label>

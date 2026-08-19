@@ -3,10 +3,10 @@ import {
     useMap,
     useMapsLibrary,
 } from "@vis.gl/react-google-maps";
-import {Location} from "@/feature/photo/type";
+import {GooglePlace} from "@/feature/photo/type";
 
 type PlaceSearchProps = {
-    onLocationChange?: (location: Location) => void;
+    onLocationChange: (place: GooglePlace) => void;
 };
 
 
@@ -41,31 +41,28 @@ export function PlaceSearch({onLocationChange,}: PlaceSearchProps) {
                 const place = autocomplete.getPlace();
                 const location = place.geometry?.location;
                 const placeId = place.place_id;
+                const placeName = place.name;
 
-                if (!location) {
-                    return;
+                if (location && placeId && placeName) {
+                    const position = {
+                        lat: location.lat(),
+                        lng: location.lng(),
+                    };
+
+                    if (place.geometry?.viewport) {
+                        map.fitBounds(place.geometry.viewport);
+                    } else {
+                        map.panTo(position);
+                        map.setZoom(18);
+                    }
+
+                    onLocationChange({
+                        location: position,
+                        placeId: placeId,
+                        placeName: placeName
+                    });
                 }
-
-                const position = {
-                    lat: location.lat(),
-                    lng: location.lng(),
-                };
-
-                if (place.geometry?.viewport) {
-                    map.fitBounds(place.geometry.viewport);
-                } else {
-                    map.panTo(position);
-                    map.setZoom(18);
-                }
-
-                onLocationChange?.({
-                    coordinate: position,
-                    address: place.formatted_address ?? "",
-                    placeId: place.place_id,
-                    placeName: place.name
-
-                });
-            },
+            }
         );
 
         return () => {
