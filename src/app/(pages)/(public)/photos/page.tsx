@@ -1,6 +1,6 @@
 import {PhotoCard} from "@/feature/photo/components/photo-card";
 import {GooglePlace} from "@/feature/photo/type";
-import {SelectedImage} from "@/components/ui/image-selector";
+import {SelectedImage} from "@/feature/photo/components/image-selector";
 
 type PhotoListItem = {
     seq: number;

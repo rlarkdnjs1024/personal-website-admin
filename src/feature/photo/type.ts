@@ -1,5 +1,5 @@
 import {Coordinate} from "@/lib/types";
-import {SelectedImage} from "@/components/ui/image-selector";
+import {SelectedImage} from "@/feature/photo/components/image-selector";
 
 export type Country = {
     code: string,

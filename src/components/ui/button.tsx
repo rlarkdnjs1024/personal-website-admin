@@ -2,17 +2,20 @@ import {ReactNode} from "react";
 import {cn} from "@/lib/utils";
 
 export type ButtonProps = {
-    onClick: () => void,
+    onClick?: () => void,
+    type?: "button" | "submit";
     className?: string;
     children?: ReactNode
+    loading?: boolean;
 }
 
-export function Button({onClick, className, children}: ButtonProps) {
+export function Button({onClick, type = "button", className, children, loading}: ButtonProps) {
     return (
         <button
-            type="button"
+            type={type}
             onClick={onClick}
-            className={cn("hover:cursor-pointer rounded-md box-border px-4 py-2 text-sm font-medium text-white bg-[#4a6248d4] hover:bg-[#4a6248] transition-colors disabled:cursor-not-allowed disabled:opacity-60", className)}
+            disabled={loading}
+            className={cn("flex items-center justify-center gap-2 hover:cursor-pointer rounded-md box-border px-4 py-2 text-sm font-medium text-white bg-[#4a6248d4] hover:bg-[#4a6248] transition-colors disabled:cursor-not-allowed disabled:opacity-60", className)}
         >
             {children}
         </button>

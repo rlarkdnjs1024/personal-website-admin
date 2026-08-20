@@ -1,7 +1,8 @@
 "use client"
-import {ImageSelector, ImageSelectorPolicy, SelectedImage} from "@/components/ui/image-selector";
+import {ImageSelector, ImageSelectorPolicy, SelectedImage} from "@/feature/photo/components/image-selector";
 import {useCallback, useEffect, useState} from "react";
 import {Button} from "@/components/ui/button";
+import {LoadingDots} from "@/components/ui/loading-dots";
 import {z} from "zod";
 import {supabaseBrowserClient} from "@/lib/supabase.browser";
 import {LocationView} from "@/feature/photo/components/location-view";
@@ -16,6 +17,7 @@ import {PreviewPhotoCard} from "@/feature/photo/components/photo-card";
 import {useMap} from "@vis.gl/react-google-maps";
 import {SingleCheckBox} from "@/components/ui/checkbox";
 import {Coordinate} from "@/lib/types";
+import {toLocalDateTime} from "@/feature/photo/util";
 
 
 type NewPhotoPageProps = {
@@ -35,12 +37,7 @@ export function Form({countryList}: NewPhotoPageProps) {
     const [comment, setComment] = useState<string>("");
     const [hashTags, setHashTags] = useState<string[]>([]);
     const [useExifCoordinate, setUseExifCoordinate] = useState<boolean>(false);
-
-
-
-    console.log("이미지", image?.originalLocation);
-    console.log("구글 플레이스", place);
-    console.log("DB좌표", coordinate);
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
     const policy: ImageSelectorPolicy  = {
         maximumBytes: 500 * 1024,
@@ -58,16 +55,9 @@ export function Form({countryList}: NewPhotoPageProps) {
 
         //image를 등록하면 EXIF DATA에서 촬영 날짜와 위치를 set한다.
         const date = image.takenAt;
-        const coordinate = image.originalLocation;
 
         if (date) {
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, "0");
-            const day = String(date.getDate()).padStart(2, "0");
-            const hour = String(date.getHours()).padStart(2, "0");
-            const minute = String(date.getMinutes()).padStart(2, "0");
-            const second = String(date.getSeconds()).padStart(2, "0");
-            setTakenAt(`${year}-${month}-${day}T${hour}:${minute}:${second}`);
+            setTakenAt(toLocalDateTime(date));
         }
     }, [image]);
 
@@ -101,66 +91,71 @@ export function Form({countryList}: NewPhotoPageProps) {
             return;
         }
 
-        const getUploadUrlPath = new URL("/api/admin/photos/uploadUrl", window.location.origin);
-        getUploadUrlPath.searchParams.set("takenAt", dto.data!.takenAt);
-
-        //서버에서 사진 업로드용 signed url을 받아온다.
-        let result;
+        setIsSubmitting(true);
         try {
-            result = await fetch(getUploadUrlPath);
-        } catch (e) {
-            console.error(e)
-            window.alert("Network Error");
-            return;
-        }
+            const getUploadUrlPath = new URL("/api/admin/photos/uploadUrl", window.location.origin);
+            getUploadUrlPath.searchParams.set("takenAt", dto.data!.takenAt);
 
-        let uploadUrl
-        try {
-            uploadUrl = await result.json();
-            if (!result.ok) {
-                window.alert(uploadUrl.message);
+            //서버에서 사진 업로드용 signed url을 받아온다.
+            let result;
+            try {
+                result = await fetch(getUploadUrlPath);
+            } catch (e) {
+                console.error(e)
+                window.alert("Network Error");
                 return;
             }
-        } catch (e) {
-            console.error(e);
-            window.alert("Internal server error");
-            return;
-        }
 
-        try {
-            const {error} = await supabaseBrowserClient
-                .storage
-                .from("images")
-                .uploadToSignedUrl(uploadUrl.path, uploadUrl.token, image!.uploadFile);
-
-            if (error) {
+            let uploadUrl
+            try {
+                uploadUrl = await result.json();
+                if (!result.ok) {
+                    window.alert(uploadUrl.message);
+                    return;
+                }
+            } catch (e) {
+                console.error(e);
                 window.alert("Internal server error");
                 return;
             }
 
-        } catch (e) {
-            console.error(e);
-            window.alert("Network error");
-            return;
-        }
+            try {
+                const {error} = await supabaseBrowserClient
+                    .storage
+                    .from("images")
+                    .uploadToSignedUrl(uploadUrl.path, uploadUrl.token, image!.uploadFile);
 
-        //metadata 업로드 api
-        try {
-            const result = await fetch("/api/admin/photos", {
-                method: "POST",
-                body: JSON.stringify({...dto.data, storagePath: uploadUrl.path})
-            });
+                if (error) {
+                    window.alert("Internal server error");
+                    return;
+                }
 
-            if (!result.ok) {
-                window.alert(uploadUrl.message);
+            } catch (e) {
+                console.error(e);
+                window.alert("Network error");
                 return;
             }
-            window.location.href = "/admin"
 
-        } catch (e) {
-            console.error(e);
-            window.alert("Network error");
-            return;
+            //metadata 업로드 api
+            try {
+                const result = await fetch("/api/admin/photos", {
+                    method: "POST",
+                    body: JSON.stringify({...dto.data, storagePath: uploadUrl.path})
+                });
+
+                if (!result.ok) {
+                    window.alert(uploadUrl.message);
+                    return;
+                }
+                window.location.href = "/admin"
+
+            } catch (e) {
+                console.error(e);
+                window.alert("Network error");
+                return;
+            }
+        } finally {
+            setIsSubmitting(false);
         }
     }
 
@@ -339,10 +334,11 @@ export function Form({countryList}: NewPhotoPageProps) {
                     </div>
 
                     <Button
-                        className="m-auto"
+                        className="mx-auto"
                         onClick={handleSubmit}
+                        loading={isSubmitting}
                     >
-                        submit!
+                        {isSubmitting ? <LoadingDots label="Submitting"/> : "submit!"}
                     </Button>
 
                 </div>

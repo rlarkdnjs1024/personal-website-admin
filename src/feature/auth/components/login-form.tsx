@@ -1,5 +1,7 @@
 "use client"
 import React, {useState} from "react";
+import {Button} from "@/components/ui/button";
+import {LoadingDots} from "@/components/ui/loading-dots";
 
 type Props = {
     redirectTo?: string;
@@ -10,6 +12,7 @@ export default function LoginForm({redirectTo}: Props) {
     const [password, setPassword] = useState<string>("");
     const [emailError, setEmailError] = useState<string|null>(null);
     const [passwordError, setPasswordError] = useState<string|null>(null);
+    const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
     async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
 
@@ -24,6 +27,7 @@ export default function LoginForm({redirectTo}: Props) {
             return;
         }
 
+        setIsSubmitting(true);
         try {
             const result = await fetch(
                 "/api/session",
@@ -40,6 +44,8 @@ export default function LoginForm({redirectTo}: Props) {
             }
         } catch {
             window.alert("Network Error");
+        } finally {
+            setIsSubmitting(false);
         }
     }
 
@@ -101,11 +107,13 @@ export default function LoginForm({redirectTo}: Props) {
                         </div>
 
                         <div className="w-full text-center">
-                            <button
+                            <Button
                                 type="submit"
-                                className="bg-gray-100 p-2 rounded-md shadow hover:cursor-pointer"
-                            >Sign in
-                            </button>
+                                className="mx-auto"
+                                loading={isSubmitting}
+                            >
+                                {isSubmitting ? <LoadingDots label="Loading"/> : "Sign in"}
+                            </Button>
                         </div>
                     </div>
                 </div>

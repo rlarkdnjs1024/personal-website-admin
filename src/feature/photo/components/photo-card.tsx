@@ -1,7 +1,7 @@
 "use client"
 
 import {GooglePlace, PhotoCardProps, PreviewPhotoCardProps} from "@/feature/photo/type";
-import {SelectedImage} from "@/components/ui/image-selector";
+import {SelectedImage} from "@/feature/photo/components/image-selector";
 import {useState} from "react";
 import {formatTakenAt} from "@/feature/photo/util";
 
@@ -55,7 +55,8 @@ export function PreviewPhotoCard({
             {/* Photo */}
             <div
                 className={`
-                    relative aspect-square w-full overflow-hidden bg-[#f5f6f4]
+                    relative w-full overflow-hidden bg-[#f5f6f4]
+                    ${!image ? "aspect-square" : ""}
                     ${image && hasDetails ? "cursor-pointer" : ""}
                 `}
                 onClick={() => {
@@ -68,7 +69,7 @@ export function PreviewPhotoCard({
                     <img
                         src={image.previewUrl}
                         alt="Preview"
-                        className="block h-full w-full object-cover"
+                        className="block w-full h-auto"
                         draggable={false}
                     />
                 ) : (
