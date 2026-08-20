@@ -12,6 +12,12 @@ export type GooglePlace = {
     location: Coordinate,
 }
 
+export type Location = {
+    coordinate: Coordinate,
+    placeId?: string,
+    placeName?: string,
+}
+
 export type PreviewPhotoCardProps = {
     image: SelectedImage | null;
     cityName: string;

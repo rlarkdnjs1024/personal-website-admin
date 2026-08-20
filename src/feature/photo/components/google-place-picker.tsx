@@ -3,9 +3,12 @@ import {PlaceSearch} from "@/feature/photo/components/place-search";
 import {Coordinate} from "@/lib/types";
 import {GooglePlace} from "@/feature/photo/type";
 
-export function GooglePlacePicker({place, setPlace, exifLocation}: {place: GooglePlace|null, setPlace: (place: GooglePlace) => void, exifLocation: Coordinate|null}) {
-
-    const needExifMarker = !(!!place && !!exifLocation && isEqual(place.location, exifLocation))
+type GooglePlacePickerProps = {
+    coordinate: Coordinate|null;
+    setPlace: (place: GooglePlace) => void,
+    setCoordinate: (coordinate: Coordinate) => void,
+}
+export function GooglePlacePicker({coordinate, setPlace, setCoordinate}: GooglePlacePickerProps) {
 
     return (
         <div className={"relative w-full aspect-square"}>
@@ -16,8 +19,7 @@ export function GooglePlacePicker({place, setPlace, exifLocation}: {place: Googl
                 defaultCenter={{lat: 51, lng: 6}}
             >
                 <PlaceSearch onLocationChange={setPlace}/>
-                {place?.location && <Marker location={place.location} />}
-                {needExifMarker && <Marker location={exifLocation!} backgroundColor={'#808080'} glyphText={"E"}/>}
+                {coordinate && <Marker location={coordinate}/>}
             </Map>
         </div>
 

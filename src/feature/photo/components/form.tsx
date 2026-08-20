@@ -68,12 +68,6 @@ export function Form({countryList}: NewPhotoPageProps) {
             const second = String(date.getSeconds()).padStart(2, "0");
             setTakenAt(`${year}-${month}-${day}T${hour}:${minute}:${second}`);
         }
-
-        if (coordinate && map) {
-            map.panTo(coordinate);
-            map.setZoom(15)
-        }
-
     }, [image]);
 
     //use EXIF location 옵션에 따라 coordinate synchronize
@@ -86,6 +80,14 @@ export function Form({countryList}: NewPhotoPageProps) {
             setCoordinate(place ? {...place.location} : null);
         }
     }, [useExifCoordinate, image, place]);
+
+    useEffect(() => {
+        if (map && coordinate) {
+            map.panTo(coordinate);
+            map.setZoom(15)
+        }
+
+    }, [coordinate]);
 
 
     async function handleSubmit() {
@@ -187,8 +189,6 @@ export function Form({countryList}: NewPhotoPageProps) {
             hashTags: z.array(z.string()),
 
         });
-
-        const coordinate = useExifCoordinate ? image.originalLocation! : place?.location!;
 
         const parseResult = scheme.safeParse({
             mimeType: image.uploadMimeType,
@@ -297,9 +297,9 @@ export function Form({countryList}: NewPhotoPageProps) {
                         </SingleCheckBox>
                         <div className="w-full aspect-square overflow-hidden rounded-lg border border-gray-200">
                             <GooglePlacePicker
-                                place={place}
+                                coordinate={coordinate}
+                                setCoordinate={setCoordinate}
                                 setPlace={setPlace}
-                                exifLocation={image?.originalLocation ?? null}
                             />
                         </div>
                     </div>
