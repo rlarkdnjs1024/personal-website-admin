@@ -71,18 +71,15 @@ export function PlaceSearch({onLocationChange,}: PlaceSearchProps) {
     }, [map, placesLibrary, onLocationChange]);
 
     return (
-            <div className={"absolute top-2 left-2 right-2"}>
-                <input
-                    ref={inputRef}
-                    type="text"
-                    placeholder="Enter a location."
-                    className="
-                        w-full rounded-md border border-gray-300
-                        bg-white px-4 py-3 text-sm shadow-md
-                        outline-none focus:border-[#4a6248d4]
-                    "
-                />
-            </div>
-
+        <input
+            ref={inputRef}
+            type="text"
+            placeholder="Enter a location."
+            className="
+                w-full h-10 rounded-lg border border-gray-200
+                bg-white px-3 text-sm
+                outline-none transition-colors focus:border-[#4a6248d4]
+            "
+        />
     );
 }

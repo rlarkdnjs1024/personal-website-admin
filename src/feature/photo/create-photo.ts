@@ -16,10 +16,9 @@ const createPhotoSchema = z.object({
     cityName: z.string().max(50, "cityName must be at most 50 characters"),
     latitude: z.number().min(-90, "latitude must be at least -90").max(90, "latitude must be at most 90"),
     longitude: z.number().min(-180, "longitude must be at least -180").max(180, "longitude must be at most 180"),
-    comment: z.string().min(0, "comment is missing"),
-    address: z.string().min(0, "address is missing"),
-    placeName: z.string().min(0, "placeName is missing"),
-    placeId: z.string().min(0, "placeId is missing"),
+    comment: z.string(),
+    placeName: z.string().nullable(),
+    placeId: z.string().nullable(),
     hashTags: z.array(z.string()),
 })
 
@@ -51,9 +50,8 @@ export async function createPhoto(
         p_latitude: data.latitude,
         p_longitude: data.longitude,
         p_comment: data.comment,
-        p_address: data.address,
-        p_place_name: data.placeName,
-        p_place_id: data.placeId,
+        p_place_name: data.placeName ?? "",
+        p_place_id: data.placeId ?? "",
         p_hash_tags: data.hashTags,
     });
 
@@ -63,3 +61,5 @@ export async function createPhoto(
 
     return photoSeq;
 }
+
+

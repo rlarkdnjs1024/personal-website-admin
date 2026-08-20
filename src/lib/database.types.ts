@@ -57,9 +57,8 @@ export type Database = {
       }
       tb_photos: {
         Row: {
-          address: string
           city_name: string
-          comment: string
+          comment: string | null
           country_code: string
           country_name: string
           created_at: string
@@ -68,8 +67,8 @@ export type Database = {
           latitude: number
           longitude: number
           mime_type: string
-          place_id: string
-          place_name: string
+          place_id: string | null
+          place_name: string | null
           seq: number
           status: string
           storage_path: string
@@ -78,9 +77,8 @@ export type Database = {
           width: number | null
         }
         Insert: {
-          address: string
           city_name: string
-          comment: string
+          comment?: string | null
           country_code: string
           country_name: string
           created_at?: string
@@ -89,8 +87,8 @@ export type Database = {
           latitude: number
           longitude: number
           mime_type: string
-          place_id: string
-          place_name: string
+          place_id?: string | null
+          place_name?: string | null
           seq?: number
           status?: string
           storage_path: string
@@ -99,9 +97,8 @@ export type Database = {
           width?: number | null
         }
         Update: {
-          address?: string
           city_name?: string
-          comment?: string
+          comment?: string | null
           country_code?: string
           country_name?: string
           created_at?: string
@@ -110,8 +107,8 @@ export type Database = {
           latitude?: number
           longitude?: number
           mime_type?: string
-          place_id?: string
-          place_name?: string
+          place_id?: string | null
+          place_name?: string | null
           seq?: number
           status?: string
           storage_path?: string
@@ -221,7 +218,6 @@ export type Database = {
     Functions: {
       create_photo: {
         Args: {
-          p_address: string
           p_city_name: string
           p_comment: string
           p_country_code: string

@@ -4,7 +4,8 @@ import {useCallback, useEffect, useState} from "react";
 import {Button} from "@/components/ui/button";
 import {z} from "zod";
 import {supabaseBrowserClient} from "@/lib/supabase.browser";
-import {GooglePlacePicker} from "@/feature/photo/components/google-place-picker";
+import {LocationView} from "@/feature/photo/components/location-view";
+import {PlaceSearch} from "@/feature/photo/components/place-search";
 import {SelectBox, SelectOption} from "@/components/ui/select-box";
 import {countryCodeToFlag} from "@/lib/utils";
 import {SearchInput} from "@/components/ui/search-input";
@@ -182,10 +183,9 @@ export function Form({countryList}: NewPhotoPageProps) {
             cityName: z.string().max(50, "cityName must be at most 50 characters"),
             latitude: z.number().min(-90, "latitude must be at least -90").max(90, "latitude must be at most 90"),
             longitude: z.number().min(-180, "longitude must be at least -180").max(180, "longitude must be at most 180"),
-            comment: z.string().min(1, "comment is missing"),
-            address: z.string().min(1, "address is missing"),
-            placeName: z.string().min(1, "placeName is missing"),
-            placeId: z.string().min(1, "placeId is missing"),
+            comment: z.string(),
+            placeName: z.string().nullable(),
+            placeId: z.string().nullable(),
             hashTags: z.array(z.string()),
 
         });
@@ -208,6 +208,7 @@ export function Form({countryList}: NewPhotoPageProps) {
         });
 
         if (parseResult.success) {
+            debugger
             return {ok: true, error: null, data: parseResult.data};
         }
 
@@ -288,6 +289,11 @@ export function Form({countryList}: NewPhotoPageProps) {
 
                     <div>
                         <div className={"font-bold mb-1"}>Place</div>
+                        <PlaceSearch onLocationChange={setPlace}/>
+                    </div>
+
+                    <div>
+                        <div className={"font-bold mb-1"}>Location</div>
                         <SingleCheckBox
                             value={useExifCoordinate}
                             onValueChange={setUseExifCoordinate}
@@ -296,10 +302,8 @@ export function Form({countryList}: NewPhotoPageProps) {
                             use EXIf location data
                         </SingleCheckBox>
                         <div className="w-full aspect-square overflow-hidden rounded-lg border border-gray-200">
-                            <GooglePlacePicker
+                            <LocationView
                                 coordinate={coordinate}
-                                setCoordinate={setCoordinate}
-                                setPlace={setPlace}
                             />
                         </div>
                     </div>
