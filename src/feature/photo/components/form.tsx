@@ -1,6 +1,6 @@
 "use client"
 import {ImageSelector, ImageSelectorPolicy, SelectedImage} from "@/components/ui/image-selector";
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import {Button} from "@/components/ui/button";
 import {z} from "zod";
 import {supabaseBrowserClient} from "@/lib/supabase.browser";
@@ -51,6 +51,7 @@ export function Form({countryList}: NewPhotoPageProps) {
     useEffect(() => {
         //image가 삭제되면 촬영 날짜와 장소를 초기화한다.
         if (!image) {
+            setUseExifCoordinate(false);
             return;
         }
 
@@ -213,7 +214,7 @@ export function Form({countryList}: NewPhotoPageProps) {
         return {ok: false, error: parseResult.error.issues[0].message}
     }
 
-    async function searchCityName(keyword: string) {
+    const searchCityName = useCallback(async (keyword: string) => {
         const url = new URL("/api/admin/cities", window.location.origin);
         url.searchParams.set("search", keyword.trim().toLowerCase());
         const response = await fetch(url);
@@ -224,7 +225,7 @@ export function Form({countryList}: NewPhotoPageProps) {
 
         const json = await response.json();
         return json.data as string[];
-    }
+    }, []);
 
 
     return (
